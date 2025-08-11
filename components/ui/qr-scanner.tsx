@@ -88,8 +88,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Scan QR Code</h3>
           <Button
@@ -104,16 +104,16 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
 
         <div className="space-y-4">
           {!isScanning ? (
-            <div className="text-center">
-              <div className="mb-4">
-                <QrCode className="h-16 w-16 text-gray-400 mx-auto" />
+            <div className="text-center py-8">
+              <div className="mb-6 flex justify-center">
+                <QrCode className="h-20 w-20 text-gray-400" />
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-6 text-lg">
                 Click the button below to start scanning QR codes with your camera
               </p>
               <Button
                 onClick={startScanning}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 mx-auto"
                 size="lg"
               >
                 <Camera className="h-5 w-5" />
@@ -121,9 +121,9 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="text-center">
-                <p className="text-gray-600 mb-2">
+                <p className="text-gray-600 mb-3 text-lg font-medium">
                   Point your camera at a QR code
                 </p>
                 <p className="text-sm text-gray-500">
@@ -163,8 +163,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
             </div>
           )}
 
-          <div className="text-center text-xs text-gray-500">
-            <p>Make sure you have a working camera and have granted camera permissions.</p>
+          <div className="text-center text-xs text-gray-500 pt-4 border-t">
+            <p className="mb-1">Make sure you have a working camera and have granted camera permissions.</p>
             <p>QR codes should contain the item ID for quick scanning.</p>
           </div>
         </div>

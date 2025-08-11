@@ -28,7 +28,7 @@ interface ConsumptionRecord {
     id: string;
     name: string;
     description?: string;
-    type: {
+    consumptionType: {
       id: string;
       name: string;
       period: "WEEKLY" | "MONTHLY";
@@ -353,8 +353,8 @@ export default function Records() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
-                            {getPeriodBadge(record.item.type.period)}
-                            <span className="text-sm">{record.item.type.name}</span>
+                            {getPeriodBadge(record.item.consumptionType.period)}
+                            <span className="text-sm">{record.item.consumptionType.name}</span>
                           </div>
                         </TableCell>
                         <TableCell>

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const item = await prisma.consumptionItem.findUnique({
       where: { id: itemId },
       include: {
-        type: true,
+        consumptionType: true,
       },
     });
 

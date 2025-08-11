@@ -18,11 +18,11 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, description, purchaseDate, photo, typeId, quantity } = body;
+    const { name, description, purchaseDate, photo, consumptionTypeId } = body;
 
-    if (!name || !typeId || !quantity || !purchaseDate) {
+    if (!name || !consumptionTypeId || !purchaseDate) {
       return NextResponse.json(
-        { error: "Name, type, quantity, and purchase date are required" },
+        { error: "Name, type, and purchase date are required" },
         { status: 400 }
       );
     }
@@ -34,11 +34,10 @@ export async function PUT(
         description,
         purchaseDate: new Date(purchaseDate),
         photo,
-        typeId,
-        quantity: parseInt(quantity),
+        consumptionTypeId,
       },
       include: {
-        type: true,
+        consumptionType: true,
       },
     });
 

@@ -30,8 +30,7 @@ interface ConsumptionItem {
   description?: string;
   purchaseDate: string;
   photo?: string;
-  quantity: number;
-  type: ConsumptionType;
+  consumptionType: ConsumptionType;
   createdAt: string;
 }
 
@@ -68,8 +67,7 @@ export default function Items() {
     description: "",
     purchaseDate: "",
     photo: "",
-    typeId: "",
-    quantity: ""
+    consumptionTypeId: "",
   });
   const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
   const [selectedItemForQrCode, setSelectedItemForQrCode] = useState<ConsumptionItem | null>(null);
@@ -110,7 +108,7 @@ export default function Items() {
       });
       
       if (selectedTypeId && selectedTypeId !== "all") {
-        params.append('typeId', selectedTypeId);
+        params.append('consumptionTypeId', selectedTypeId);
       }
       
       const response = await fetch(`/api/consumption-items?${params}`);
@@ -142,8 +140,7 @@ export default function Items() {
       description: "",
       purchaseDate: "",
       photo: "",
-      typeId: "",
-      quantity: ""
+      consumptionTypeId: "",
     });
     setEditingItem(null);
     setShowForm(false);
@@ -156,8 +153,7 @@ export default function Items() {
       description: item.description || "",
       purchaseDate: item.purchaseDate.split('T')[0], // Format date for input
       photo: item.photo || "",
-      typeId: item.type.id,
-      quantity: item.quantity.toString()
+      consumptionTypeId: item.consumptionType.id,
     });
     setShowForm(true);
   };
@@ -180,7 +176,6 @@ export default function Items() {
         },
         body: JSON.stringify({
           ...formData,
-          quantity: parseInt(formData.quantity),
         }),
       });
 
@@ -486,10 +481,10 @@ export default function Items() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="typeId">Consumption Type</Label>
+                    <Label htmlFor="consumptionTypeId">Consumption Type</Label>
                     <Select
-                      value={formData.typeId}
-                      onValueChange={(value) => setFormData({ ...formData, typeId: value })}
+                      value={formData.consumptionTypeId}
+                      onValueChange={(value) => setFormData({ ...formData, consumptionTypeId: value })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a type" />
@@ -506,17 +501,6 @@ export default function Items() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="quantity">Available Quantity</Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      placeholder="e.g., 100"
-                      value={formData.quantity}
-                      onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="purchaseDate">Purchase Date</Label>
                     <Input
                       id="purchaseDate"
@@ -526,6 +510,16 @@ export default function Items() {
                       required
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Describe the item..."
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <PhotoUpload
@@ -533,16 +527,6 @@ export default function Items() {
                     onChange={(value) => setFormData({ ...formData, photo: value })}
                     label="Photo (Optional)"
                     placeholder="Enter photo URL or upload file"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description (Optional)</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe the item..."
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
                   />
                 </div>
                 <div className="flex space-x-4">
@@ -579,7 +563,6 @@ export default function Items() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Quantity</TableHead>
                   <TableHead>Purchase Date</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Photo</TableHead>
@@ -594,16 +577,11 @@ export default function Items() {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Package className="h-4 w-4 text-gray-500" />
-                        <span>{item.type.name}</span>
+                        <span>{item.consumptionType.name}</span>
                         <span className="text-xs text-gray-500">
-                          ({item.type.period.toLowerCase()})
+                          ({item.consumptionType.period.toLowerCase()})
                         </span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className={`font-medium ${item.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {item.quantity}
-                      </span>
                     </TableCell>
                     <TableCell>
                       {formatDate(item.purchaseDate)}
@@ -662,7 +640,7 @@ export default function Items() {
                 ))}
                 {items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
                       {searchTerm || selectedTypeId !== "all" ? "No items found matching your criteria." : "No items found. Create your first one above."}
                     </TableCell>
                   </TableRow>

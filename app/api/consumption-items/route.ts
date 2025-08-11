@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || '';
-    const typeId = searchParams.get('typeId') || '';
+    const consumptionTypeId = searchParams.get('consumptionTypeId') || '';
     
     const skip = (page - 1) * limit;
     
@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    if (typeId) {
-      where.typeId = typeId;
+    if (consumptionTypeId) {
+      where.consumptionTypeId = consumptionTypeId;
     }
     
     // Get total count for pagination
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const items = await prisma.consumptionItem.findMany({
       where,
       include: {
-        type: true,
+        consumptionType: true,
       },
       skip,
       take: limit,
@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, purchaseDate, photo, typeId, quantity } = body;
+    const { name, description, purchaseDate, photo, consumptionTypeId } = body;
 
-    if (!name || !typeId || !quantity) {
+    if (!name || !consumptionTypeId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -95,11 +95,10 @@ export async function POST(request: NextRequest) {
         description,
         purchaseDate: new Date(purchaseDate),
         photo,
-        typeId,
-        quantity,
+        consumptionTypeId,
       },
       include: {
-        type: true,
+        consumptionType: true,
       },
     });
 

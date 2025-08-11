@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
     }
     
     if (startDate || endDate) {
-      where.takenAt = {};
-      if (startDate) where.takenAt.gte = new Date(startDate);
-      if (endDate) where.takenAt.lte = new Date(endDate);
+      where.date = {};
+      if (startDate) where.date.gte = new Date(startDate);
+      if (endDate) where.date.lte = new Date(endDate);
     }
     
     // Get total count for pagination
@@ -58,14 +58,14 @@ export async function GET(request: NextRequest) {
         user: true,
         item: {
           include: {
-            type: true,
+            consumptionType: true,
           },
         },
       },
       skip,
       take: limit,
       orderBy: {
-        takenAt: 'desc',
+        date: 'desc',
       },
     });
     
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     // Cek apakah item masih tersedia
     const item = await prisma.consumptionItem.findUnique({
       where: { id: itemId },
-      include: { type: true },
+      include: { consumptionType: true },
     });
 
     if (!item) {
@@ -125,18 +125,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (item.quantity < quantity) {
-      return NextResponse.json(
-        { error: "Insufficient quantity available" },
-        { status: 400 }
-      );
-    }
-
     // Cek batas pengambilan berdasarkan periode
     const now = new Date();
     let startDate: Date;
     
-    if (item.type.period === "WEEKLY") {
+    if (item.consumptionType.period === "WEEKLY") {
       startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     } else {
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -146,7 +139,7 @@ export async function POST(request: NextRequest) {
       where: {
         userId: session.user.id,
         itemId: itemId,
-        takenAt: {
+        date: {
           gte: startDate,
         },
       },
@@ -154,38 +147,33 @@ export async function POST(request: NextRequest) {
 
     const totalTaken = userRecords.reduce((sum, record) => sum + record.quantity, 0);
     
-    if (totalTaken + quantity > item.type.limit) {
+    if (totalTaken + quantity > item.consumptionType.limit) {
       return NextResponse.json(
-        { error: `Exceeds limit of ${item.type.limit} per ${item.type.period.toLowerCase()}` },
+        { error: `Exceeds limit of ${item.consumptionType.limit} per ${item.consumptionType.period.toLowerCase()}` },
         { status: 400 }
       );
     }
 
-    // Buat record dan update quantity item
-    const record = await prisma.$transaction([
-      prisma.consumptionRecord.create({
-        data: {
-          userId: session.user.id,
-          itemId,
-          quantity,
-          photo,
-          notes,
-        },
-        include: {
-          item: {
-            include: {
-              type: true,
-            },
+    // Create consumption record
+    const record = await prisma.consumptionRecord.create({
+      data: {
+        userId: session.user.id,
+        itemId: itemId,
+        quantity: quantity,
+        photo: photo,
+        notes: notes,
+      },
+      include: {
+        user: true,
+        item: {
+          include: {
+            consumptionType: true,
           },
         },
-      }),
-      prisma.consumptionItem.update({
-        where: { id: itemId },
-        data: { quantity: item.quantity - quantity },
-      }),
-    ]);
+      },
+    });
 
-    return NextResponse.json(record[0], { status: 201 });
+    return NextResponse.json(record, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to create consumption record" },

@@ -23,7 +23,7 @@ interface ConsumptionRecord {
     id: string;
     name: string;
     description?: string;
-    type: {
+    consumptionType: {
       id: string;
       name: string;
       limit: number;
@@ -130,19 +130,19 @@ export default function MyRecords() {
     const now = new Date();
     let startDate: Date;
     
-    if (record.item.type.period === "WEEKLY") {
+    if (record.item.consumptionType.period === "WEEKLY") {
       startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     } else {
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
     }
 
     const periodRecords = records.filter(r => 
-      r.item.type.id === record.item.type.id &&
+      r.item.consumptionType.id === record.item.consumptionType.id &&
       new Date(r.takenAt) >= startDate
     );
 
     const totalTaken = periodRecords.reduce((sum, r) => sum + r.quantity, 0);
-    const limit = record.item.type.limit;
+    const limit = record.item.consumptionType.limit;
     const percentage = (totalTaken / limit) * 100;
 
     if (percentage >= 90) {
@@ -318,12 +318,12 @@ export default function MyRecords() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {new Set(records.map(r => r.item.type.id)).size}
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {new Set(records.map(r => r.item.consumptionType.id)).size}
+                </div>
+                <div className="text-sm text-gray-600">Consumption Types</div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Different consumption types
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -338,51 +338,53 @@ export default function MyRecords() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from(new Set(records.map(r => r.item.type.id))).map(typeId => {
-                const typeRecords = records.filter(r => r.item.type.id === typeId);
-                const type = typeRecords[0]?.item.type;
-                if (!type) return null;
-
+              {Array.from(new Set(records.map(r => r.item.consumptionType.id))).map(typeId => {
+                const typeRecords = records.filter(r => r.item.consumptionType.id === typeId);
+                const typeName = typeRecords[0]?.item.consumptionType.name || 'Unknown';
+                const typePeriod = typeRecords[0]?.item.consumptionType.period || 'WEEKLY';
+                
+                // Calculate total taken for this type
+                const totalTaken = typeRecords.reduce((sum, r) => sum + r.quantity, 0);
+                const limit = typeRecords[0]?.item.consumptionType.limit || 0;
+                
+                // Filter records for current period
                 const now = new Date();
                 let startDate: Date;
                 
-                if (type.period === "WEEKLY") {
+                if (typePeriod === "WEEKLY") {
                   startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                 } else {
                   startDate = new Date(now.getFullYear(), now.getMonth(), 1);
                 }
-
-                const periodRecords = records.filter(r => 
-                  r.item.type.id === typeId &&
+                
+                const periodRecords = typeRecords.filter(r => 
                   new Date(r.takenAt) >= startDate
                 );
-
-                const totalTaken = periodRecords.reduce((sum, r) => sum + r.quantity, 0);
-                const remaining = Math.max(0, type.limit - totalTaken);
-                const percentage = (totalTaken / type.limit) * 100;
-
+                
+                const periodTotal = periodRecords.reduce((sum, r) => sum + r.quantity, 0);
+                
                 return (
                   <div key={typeId} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">{type.name}</h4>
-                      {getPeriodBadge(type.period)}
+                      <h4 className="font-medium">{typeName}</h4>
+                      {getPeriodBadge(typePeriod)}
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Used: {totalTaken}</span>
-                        <span>Limit: {type.limit}</span>
+                        <span>Limit: {limit}</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${
-                            percentage >= 90 ? 'bg-red-500' : 
-                            percentage >= 70 ? 'bg-yellow-500' : 'bg-green-500'
+                            (totalTaken / limit) * 100 >= 90 ? 'bg-red-500' : 
+                            (totalTaken / limit) * 100 >= 70 ? 'bg-yellow-500' : 'bg-green-500'
                           }`}
-                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                          style={{ width: `${Math.min((totalTaken / limit) * 100, 100)}%` }}
                         ></div>
                       </div>
                       <div className="text-xs text-gray-600">
-                        Remaining: {remaining} | {percentage.toFixed(1)}% used
+                        Remaining: {Math.max(0, limit - totalTaken)} | {(totalTaken / limit) * 100}.0% used
                       </div>
                     </div>
                   </div>
@@ -436,8 +438,8 @@ export default function MyRecords() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
-                            {getPeriodBadge(record.item.type.period)}
-                            <span className="text-sm">{record.item.type.name}</span>
+                            {getPeriodBadge(record.item.consumptionType.period)}
+                            <span className="text-sm">{record.item.consumptionType.name}</span>
                           </div>
                         </TableCell>
                         <TableCell>

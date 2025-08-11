@@ -20,7 +20,7 @@ interface ConsumptionItem {
   description?: string;
   photo?: string;
   quantity: number;
-  type: {
+  consumptionType: {
     id: string;
     name: string;
     limit: number;
@@ -41,7 +41,6 @@ export default function ScanQR() {
   });
   const [qrInput, setQrInput] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const [hasScannedCode, setHasScannedCode] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -83,7 +82,6 @@ export default function ScanQR() {
 
   const handleScannerResult = (result: string) => {
     setQrInput(result);
-    setHasScannedCode(true);
     setShowScanner(false);
     toast.success("QR Code scanned! Click 'Submit' to continue.");
   };
@@ -121,7 +119,6 @@ export default function ScanQR() {
         setShowForm(false);
         setFormData({ quantity: "1", notes: "", photo: "" });
         setQrInput("");
-        setHasScannedCode(false);
       } else {
         const error = await response.json();
         toast.error(error.error || "Failed to take item");
@@ -188,20 +185,15 @@ export default function ScanQR() {
               <Input
                 placeholder="Enter QR code or item ID manually"
                 value={qrInput}
-                onChange={(e) => {
-                  setQrInput(e.target.value);
-                  if (e.target.value.trim()) {
-                    setHasScannedCode(false); // Reset scan state when manually typing
-                  }
-                }}
+                onChange={(e) => setQrInput(e.target.value)}
                 className="flex-1"
               />
               <Button
-                onClick={hasScannedCode ? handleManualSubmit : () => setShowScanner(true)}
+                onClick={qrInput.trim() ? handleManualSubmit : () => setShowScanner(true)}
                 disabled={isLoading}
                 className="flex items-center space-x-2"
               >
-                {hasScannedCode ? (
+                {qrInput.trim() ? (
                   <>
                     <QrCode className="h-4 w-4" />
                     <span>{isLoading ? "Submitting..." : "Submit"}</span>
@@ -213,23 +205,10 @@ export default function ScanQR() {
                   </>
                 )}
               </Button>
-              {hasScannedCode && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setHasScannedCode(false);
-                    setQrInput("");
-                  }}
-                  className="flex items-center space-x-2"
-                >
-                  <X className="h-4 w-4" />
-                  <span>Reset</span>
-                </Button>
-              )}
             </div>
             <div className="mt-2 text-xs text-gray-500 text-center">
-              {hasScannedCode 
-                ? "QR code scanned! Click Submit to continue."
+              {qrInput.trim() 
+                ? "Code entered! Click Submit to continue."
                 : "Use the camera to scan a QR code or enter the code manually above."
               }
             </div>
@@ -258,11 +237,11 @@ export default function ScanQR() {
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-700">Type</Label>
-                    <p className="text-lg font-semibold">{scannedItem.type.name}</p>
+                    <p className="text-lg font-semibold">{scannedItem.consumptionType.name}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Limit per {scannedItem.type.period.toLowerCase()}</Label>
-                    <p className="text-lg font-semibold text-blue-600">{scannedItem.type.limit}</p>
+                    <Label className="text-sm font-medium text-gray-700">Limit per {scannedItem.consumptionType.period.toLowerCase()}</Label>
+                    <p className="text-lg font-semibold text-blue-600">{scannedItem.consumptionType.limit}</p>
                   </div>
                   {scannedItem.description && (
                     <div>
@@ -324,7 +303,6 @@ export default function ScanQR() {
                       setShowForm(false);
                       setFormData({ quantity: "1", notes: "", photo: "" });
                       setQrInput("");
-                      setHasScannedCode(false);
                     }}
                   >
                     Cancel
