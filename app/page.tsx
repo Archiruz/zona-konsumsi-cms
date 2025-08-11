@@ -205,7 +205,7 @@ export default function Home() {
             Smart office consumption management made simple
           </p>
           <p className="text-gray-500 text-sm">
-            © 2024 Zona Konsumsi CMS. All rights reserved.
+            © 2025 Zona Konsumsi CMS. All rights reserved. Made with ❤️ by Alvian.
           </p>
         </div>
       </footer>
