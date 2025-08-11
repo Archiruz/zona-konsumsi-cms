@@ -1,0 +1,195 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+// GET - Ambil semua record konsumsi dengan pagination
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+    const startDate = searchParams.get('startDate') || '';
+    const endDate = searchParams.get('endDate') || '';
+    
+    const skip = (page - 1) * limit;
+    
+    // Build where clause for search and filtering
+    const where: any = {};
+    
+    if (session.user.role !== "ADMIN") {
+      // Employee hanya bisa lihat record sendiri
+      where.userId = session.user.id;
+    }
+    
+    if (search) {
+      where.OR = [
+        { item: { name: { contains: search, mode: 'insensitive' } } },
+        { notes: { contains: search, mode: 'insensitive' } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+    
+    if (startDate || endDate) {
+      where.takenAt = {};
+      if (startDate) where.takenAt.gte = new Date(startDate);
+      if (endDate) where.takenAt.lte = new Date(endDate);
+    }
+    
+    // Get total count for pagination
+    const totalCount = await prisma.consumptionRecord.count({ where });
+    
+    // Get paginated results
+    const records = await prisma.consumptionRecord.findMany({
+      where,
+      include: {
+        user: true,
+        item: {
+          include: {
+            type: true,
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        takenAt: 'desc',
+      },
+    });
+    
+    const totalPages = Math.ceil(totalCount / limit);
+    
+    return NextResponse.json({
+      data: records,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch consumption records" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Buat record konsumsi baru (pengambilan item)
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { itemId, quantity, photo, notes } = body;
+
+    if (!itemId || !quantity || !photo) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Cek apakah item masih tersedia
+    const item = await prisma.consumptionItem.findUnique({
+      where: { id: itemId },
+      include: { type: true },
+    });
+
+    if (!item) {
+      return NextResponse.json(
+        { error: "Item not found" },
+        { status: 404 }
+      );
+    }
+
+    if (item.quantity < quantity) {
+      return NextResponse.json(
+        { error: "Insufficient quantity available" },
+        { status: 400 }
+      );
+    }
+
+    // Cek batas pengambilan berdasarkan periode
+    const now = new Date();
+    let startDate: Date;
+    
+    if (item.type.period === "WEEKLY") {
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    const userRecords = await prisma.consumptionRecord.findMany({
+      where: {
+        userId: session.user.id,
+        itemId: itemId,
+        takenAt: {
+          gte: startDate,
+        },
+      },
+    });
+
+    const totalTaken = userRecords.reduce((sum, record) => sum + record.quantity, 0);
+    
+    if (totalTaken + quantity > item.type.limit) {
+      return NextResponse.json(
+        { error: `Exceeds limit of ${item.type.limit} per ${item.type.period.toLowerCase()}` },
+        { status: 400 }
+      );
+    }
+
+    // Buat record dan update quantity item
+    const record = await prisma.$transaction([
+      prisma.consumptionRecord.create({
+        data: {
+          userId: session.user.id,
+          itemId,
+          quantity,
+          photo,
+          notes,
+        },
+        include: {
+          item: {
+            include: {
+              type: true,
+            },
+          },
+        },
+      }),
+      prisma.consumptionItem.update({
+        where: { id: itemId },
+        data: { quantity: item.quantity - quantity },
+      }),
+    ]);
+
+    return NextResponse.json(record[0], { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create consumption record" },
+      { status: 500 }
+    );
+  }
+}
