@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma schema file for PostgreSQL production deployment,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -26,45 +26,51 @@ model User {
 
 model ConsumptionType {
   id          String   @id @default(cuid())
-  name        String   @unique // e.g., "Weekly", "Monthly"
+  name        String   @unique
   description String?
-  limit       Int      // Batas pengambilan per periode
-  period      Period   // WEEKLY atau MONTHLY
+  period      Period   @default(WEEKLY)
+  limit       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   // Relations
   items ConsumptionItem[]
 }
 
 model ConsumptionItem {
-  id              String           @id @default(cuid())
-  name            String
-  description     String?
-  purchaseDate    DateTime
-  photo          String?          // URL foto item
-  typeId          String
-  quantity        Int              // Jumlah item yang tersedia
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  
+  id                String           @id @default(cuid())
+  name              String
+  description       String?
+  photo             String?
+  purchaseDate      DateTime?
+  consumptionTypeId String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
   // Relations
-  type            ConsumptionType  @relation(fields: [typeId], references: [id], onDelete: Cascade)
-  consumptionRecords ConsumptionRecord[]
+  consumptionType ConsumptionType @relation(fields: [consumptionTypeId], references: [id], onDelete: Cascade)
+  records        ConsumptionRecord[]
+
+  @@index([consumptionTypeId])
 }
 
 model ConsumptionRecord {
-  id              String   @id @default(cuid())
-  userId          String
-  itemId          String
-  quantity        Int      // Jumlah yang diambil
-  photo          String   // URL bukti foto pengambilan
-  notes           String?  // Catatan tambahan
-  takenAt         DateTime @default(now())
-  
+  id                String   @id @default(cuid())
+  userId            String
+  itemId            String
+  quantity          Int
+  date              DateTime @default(now())
+  photo             String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
   // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item            ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([itemId])
 }
 
 enum Role {

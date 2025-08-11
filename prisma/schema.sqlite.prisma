@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+
+  // Relations
+  consumptionRecords ConsumptionRecord[]
+}
+
+model ConsumptionType {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "Weekly", "Monthly"
+  description String?
+  limit       Int      // Batas pengambilan per periode
+  period      Period   // WEEKLY atau MONTHLY
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  items ConsumptionItem[]
+}
+
+model ConsumptionItem {
+  id              String           @id @default(cuid())
+  name            String
+  description     String?
+  purchaseDate    DateTime
+  photo          String?          // URL foto item
+  typeId          String
+  quantity        Int              // Jumlah item yang tersedia
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  
+  // Relations
+  type            ConsumptionType  @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  consumptionRecords ConsumptionRecord[]
+}
+
+model ConsumptionRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  itemId          String
+  quantity        Int      // Jumlah yang diambil
+  photo          String   // URL bukti foto pengambilan
+  notes           String?  // Catatan tambahan
+  takenAt         DateTime @default(now())
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item            ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum Period {
+  WEEKLY
+  MONTHLY
+}
