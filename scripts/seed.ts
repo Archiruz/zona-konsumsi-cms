@@ -67,8 +67,7 @@ async function main() {
       name: 'Coffee Beans',
       description: 'Premium coffee beans for office coffee machine',
       purchaseDate: new Date(),
-      quantity: 50,
-      typeId: weeklyType.id,
+      consumptionTypeId: weeklyType.id,
     },
   });
 
@@ -77,8 +76,7 @@ async function main() {
       name: 'Office Snacks',
       description: 'Assorted snacks and cookies',
       purchaseDate: new Date(),
-      quantity: 100,
-      typeId: weeklyType.id,
+      consumptionTypeId: weeklyType.id,
     },
   });
 
@@ -87,8 +85,7 @@ async function main() {
       name: 'Office Pens',
       description: 'Blue ballpoint pens',
       purchaseDate: new Date(),
-      quantity: 200,
-      typeId: monthlyType.id,
+      consumptionTypeId: monthlyType.id,
     },
   });
 
