@@ -1,0 +1,84 @@
+// This is your Prisma schema file for PostgreSQL production deployment,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+
+  // Relations
+  consumptionRecords ConsumptionRecord[]
+}
+
+model ConsumptionType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  period      Period   @default(WEEKLY)
+  limit       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  items ConsumptionItem[]
+}
+
+model ConsumptionItem {
+  id                String           @id @default(cuid())
+  name              String
+  description       String?
+  photo             String?
+  purchaseDate      DateTime?
+  consumptionTypeId String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  consumptionType ConsumptionType @relation(fields: [consumptionTypeId], references: [id], onDelete: Cascade)
+  records        ConsumptionRecord[]
+
+  @@index([consumptionTypeId])
+}
+
+model ConsumptionRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  itemId            String
+  quantity          Int
+  date              DateTime @default(now())
+  photo             String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([itemId])
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum Period {
+  WEEKLY
+  MONTHLY
+}
