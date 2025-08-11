@@ -18,7 +18,7 @@ interface ConsumptionRecord {
   quantity: number;
   photo: string;
   notes?: string;
-  takenAt: string;
+  date: string;
   user: {
     id: string;
     name: string;
@@ -114,11 +114,21 @@ export default function Records() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!mounted) return "";
+    if (!mounted || !dateString) return "";
     try {
-      return new Date(dateString).toLocaleString();
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     } catch {
-      return dateString;
+      return "Invalid Date";
     }
   };
 
@@ -268,10 +278,15 @@ export default function Records() {
             <CardContent>
               <div className="text-2xl font-bold">
                 {records.filter(record => {
-                  const recordDate = new Date(record.takenAt);
-                  const now = new Date();
-                  return recordDate.getMonth() === now.getMonth() && 
-                         recordDate.getFullYear() === now.getFullYear();
+                  try {
+                    const recordDate = new Date(record.date);
+                    if (isNaN(recordDate.getTime())) return false;
+                    const now = new Date();
+                    return recordDate.getMonth() === now.getMonth() && 
+                           recordDate.getFullYear() === now.getFullYear();
+                  } catch {
+                    return false;
+                  }
                 }).length}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -365,7 +380,7 @@ export default function Records() {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm">{formatDate(record.takenAt)}</span>
+                            <span className="text-sm">{formatDate(record.date)}</span>
                           </div>
                         </TableCell>
                         <TableCell>
