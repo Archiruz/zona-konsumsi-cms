@@ -384,7 +384,7 @@ export default function MyRecords() {
                         ></div>
                       </div>
                       <div className="text-xs text-gray-600">
-                        Remaining: {Math.max(0, limit - totalTaken)} | {(totalTaken / limit) * 100}.0% used
+                        Remaining: {Math.max(0, limit - totalTaken)} | {((totalTaken / limit) * 100).toFixed(1)}% used
                       </div>
                     </div>
                   </div>

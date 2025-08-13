@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, X, QrCode } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Camera, X, QrCode, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 interface QRScannerProps {
@@ -13,6 +14,8 @@ interface QRScannerProps {
 export function QRScanner({ onScan, onClose }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cameras, setCameras] = useState<any[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState<any>(null);
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrCodeRef = useRef<any>(null);
 
@@ -36,10 +39,37 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
 
       html5QrCodeRef.current = new Html5Qrcode("qr-reader");
       
-      const cameras = await Html5Qrcode.getCameras();
-      if (cameras && cameras.length > 0) {
+      const availableCameras = await Html5Qrcode.getCameras();
+      if (availableCameras && availableCameras.length > 0) {
+        setCameras(availableCameras);
+        
+        // Try to find the back camera first
+        let cameraToUse = availableCameras[0]; // fallback to first camera
+        
+        // Look for back camera by checking camera labels
+        for (const camera of availableCameras) {
+          if (camera.label.toLowerCase().includes('back') || 
+              camera.label.toLowerCase().includes('rear') ||
+              camera.label.toLowerCase().includes('environment') ||
+              camera.label.toLowerCase().includes('world')) {
+            cameraToUse = camera;
+            break;
+          }
+        }
+        
+        // If we have multiple cameras and the first one seems to be front-facing, 
+        // prefer the second one (often the back camera)
+        if (availableCameras.length > 1 && 
+            (availableCameras[0].label.toLowerCase().includes('front') || 
+             availableCameras[0].label.toLowerCase().includes('user') ||
+             availableCameras[0].label.toLowerCase().includes('selfie'))) {
+          cameraToUse = availableCameras[1];
+        }
+        
+        setSelectedCamera(cameraToUse);
+        
         await html5QrCodeRef.current.start(
-          { deviceId: { exact: cameras[0].id } },
+          { deviceId: { exact: cameraToUse.id } },
           {
             fps: 10,
             qrbox: { width: 250, height: 250 },
@@ -82,6 +112,19 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     setIsScanning(false);
   };
 
+  const switchCamera = async (cameraId: string) => {
+    if (isScanning) {
+      stopScanning();
+    }
+    
+    const camera = cameras.find(c => c.id === cameraId);
+    if (camera) {
+      setSelectedCamera(camera);
+      // Auto-start scanning with new camera
+      setTimeout(() => startScanning(), 100);
+    }
+  };
+
   const handleClose = () => {
     stopScanning();
     onClose();
@@ -111,6 +154,9 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
               <p className="text-gray-600 mb-6 text-lg">
                 Click the button below to start scanning QR codes with your camera
               </p>
+              <p className="text-sm text-gray-500 mb-4">
+                The scanner will automatically try to use the back camera for better QR code scanning
+              </p>
               <Button
                 onClick={startScanning}
                 className="flex items-center space-x-2 mx-auto"
@@ -131,6 +177,30 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 </p>
               </div>
               
+              {/* Camera Selection */}
+              {cameras.length > 1 && (
+                <div className="flex flex-col items-center space-y-3">
+                  <p className="text-sm text-gray-600">Select Camera:</p>
+                  <Select value={selectedCamera?.id} onValueChange={switchCamera}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Select camera" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cameras.map((camera) => (
+                        <SelectItem key={camera.id} value={camera.id}>
+                          {camera.label || `Camera ${camera.id.slice(0, 8)}...`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedCamera && (
+                    <p className="text-xs text-gray-500">
+                      Using: {selectedCamera.label || `Camera ${selectedCamera.id.slice(0, 8)}...`}
+                    </p>
+                  )}
+                </div>
+              )}
+              
               <div className="flex justify-center">
                 <div
                   id="qr-reader"
@@ -139,7 +209,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 ></div>
               </div>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center space-x-3">
                 <Button
                   variant="outline"
                   onClick={stopScanning}
@@ -148,6 +218,20 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   <X className="h-4 w-4" />
                   <span>Stop Scanner</span>
                 </Button>
+                {cameras.length > 1 && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const currentIndex = cameras.findIndex(c => c.id === selectedCamera?.id);
+                      const nextIndex = (currentIndex + 1) % cameras.length;
+                      switchCamera(cameras[nextIndex].id);
+                    }}
+                    className="flex items-center space-x-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    <span>Switch Camera</span>
+                  </Button>
+                )}
               </div>
             </div>
           )}
