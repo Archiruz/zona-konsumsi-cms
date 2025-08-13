@@ -18,7 +18,7 @@ interface ConsumptionRecord {
   quantity: number;
   photo: string;
   notes?: string;
-  takenAt: string;
+  date: string;
   item: {
     id: string;
     name: string;
@@ -110,11 +110,21 @@ export default function MyRecords() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!mounted) return "";
+    if (!mounted || !dateString) return "";
     try {
-      return new Date(dateString).toLocaleString();
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     } catch {
-      return dateString;
+      return "Invalid Date";
     }
   };
 
@@ -138,7 +148,7 @@ export default function MyRecords() {
 
     const periodRecords = records.filter(r => 
       r.item.consumptionType.id === record.item.consumptionType.id &&
-      new Date(r.takenAt) >= startDate
+      new Date(r.date) >= startDate
     );
 
     const totalTaken = periodRecords.reduce((sum, r) => sum + r.quantity, 0);
@@ -287,7 +297,7 @@ export default function MyRecords() {
             <CardContent>
               <div className="text-2xl font-bold">
                 {records.filter(record => {
-                  const recordDate = new Date(record.takenAt);
+                  const recordDate = new Date(record.date);
                   const now = new Date();
                   return recordDate.getMonth() === now.getMonth() && 
                          recordDate.getFullYear() === now.getFullYear();
@@ -358,7 +368,7 @@ export default function MyRecords() {
                 }
                 
                 const periodRecords = typeRecords.filter(r => 
-                  new Date(r.takenAt) >= startDate
+                  new Date(r.date) >= startDate
                 );
                 
                 const periodTotal = periodRecords.reduce((sum, r) => sum + r.quantity, 0);
@@ -450,7 +460,7 @@ export default function MyRecords() {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm">{formatDate(record.takenAt)}</span>
+                            <span className="text-sm">{formatDate(record.date)}</span>
                           </div>
                         </TableCell>
                         <TableCell>

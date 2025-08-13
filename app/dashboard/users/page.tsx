@@ -216,11 +216,21 @@ export default function UserManagement() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!mounted) return "";
+    if (!mounted || !dateString) return "";
     try {
-      return new Date(dateString).toLocaleString();
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     } catch {
-      return dateString;
+      return "Invalid Date";
     }
   };
 

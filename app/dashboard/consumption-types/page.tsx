@@ -190,11 +190,19 @@ export default function ConsumptionTypes() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!mounted) return "";
+    if (!mounted || !dateString) return "";
     try {
-      return new Date(dateString).toLocaleDateString();
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
     } catch {
-      return dateString;
+      return "Invalid Date";
     }
   };
 
