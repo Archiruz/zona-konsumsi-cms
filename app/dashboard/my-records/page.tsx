@@ -458,7 +458,7 @@ export default function MyRecords() {
                         </TableCell>
                         <TableCell>
                           {record.photo ? (
-                            <div className="flex items-center space-x-2">
+                            <div className="flex flex-col items-center space-y-2">
                               <img
                                 src={record.photo}
                                 alt="Proof photo"
