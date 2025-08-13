@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { NextAuthProvider } from "@/components/providers/NextAuthProvider";
 import { Toaster } from "sonner";
+import { PerformanceMonitor } from "@/components/ui/performance-monitor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <NextAuthProvider>
           {children}
           <Toaster />
+          <PerformanceMonitor />
         </NextAuthProvider>
       </body>
     </html>
