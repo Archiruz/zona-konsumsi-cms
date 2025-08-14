@@ -84,6 +84,7 @@ export default function Records() {
     totalQuantity: 0,
     itemsByType: {},
   });
+  const [hasInitialData, setHasInitialData] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -111,10 +112,16 @@ export default function Records() {
   }, [records]);
 
   useEffect(() => {
-    if (session && mounted && (pagination.page > 1 || searchTerm || startDate || endDate)) {
-      fetchRecords();
+    if (session && mounted && hasInitialData && (pagination.page > 1 || searchTerm || startDate || endDate)) {
+      // Only fetch if we actually have meaningful changes, not just component re-renders
+      const hasActiveFilters = searchTerm || startDate || endDate;
+      const isPageChange = pagination.page > 1;
+      
+      if (hasActiveFilters || isPageChange) {
+        fetchRecords();
+      }
     }
-  }, [pagination.page, searchTerm, startDate, endDate]);
+  }, [pagination.page, searchTerm, startDate, endDate, hasInitialData]);
 
   const getCurrentWeekRange = () => {
     const now = new Date();
@@ -161,6 +168,7 @@ export default function Records() {
         const result = await response.json();
         setRecords(result.data);
         setPagination(result.pagination);
+        setHasInitialData(true);
       } else {
         toast.error("Failed to fetch records");
       }
@@ -659,16 +667,26 @@ export default function Records() {
         {/* Records Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Records</CardTitle>
-            <CardDescription>
-              {isAdmin 
-                ? "All consumption records from all users"
-                : "Your personal consumption records"
-              }
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Records</CardTitle>
+                <CardDescription>
+                  {isAdmin 
+                    ? "All consumption records from all users"
+                    : "Your personal consumption records"
+                  }
+                </CardDescription>
+              </div>
+              {isLoading && hasInitialData && (
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                  <span>Refreshing...</span>
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isLoading && !hasInitialData ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                 <p className="mt-2 text-gray-600">Loading records...</p>

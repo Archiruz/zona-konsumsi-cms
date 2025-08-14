@@ -47,6 +47,7 @@ export default function UserManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [hasInitialData, setHasInitialData] = useState(false);
   
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -76,10 +77,22 @@ export default function UserManagement() {
   }, [status, session, router]);
 
   useEffect(() => {
-    if (session?.user.role === "ADMIN" && mounted) {
+    if (session?.user.role === "ADMIN" && mounted && hasInitialData && (pagination.page > 1 || searchTerm)) {
+      // Only fetch if we actually have meaningful changes, not just component re-renders
+      const hasActiveFilters = searchTerm;
+      const isPageChange = pagination.page > 1;
+      
+      if (hasActiveFilters || isPageChange) {
+        fetchUsers();
+      }
+    }
+  }, [session, pagination.page, searchTerm, mounted, hasInitialData]);
+
+  useEffect(() => {
+    if (session?.user.role === "ADMIN" && mounted && !hasInitialData) {
       fetchUsers();
     }
-  }, [session, pagination.page, searchTerm, mounted]);
+  }, [session, mounted, hasInitialData]);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -95,6 +108,7 @@ export default function UserManagement() {
         const result = await response.json();
         setUsers(result.data);
         setPagination(result.pagination);
+        setHasInitialData(true); // Mark data as fetched
       } else {
         toast.error("Failed to fetch users");
       }
@@ -388,13 +402,19 @@ export default function UserManagement() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isLoading && !hasInitialData ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                 <p className="mt-2 text-gray-600">Loading users...</p>
               </div>
             ) : (
               <>
+                {isLoading && hasInitialData && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                    <span>Refreshing...</span>
+                  </div>
+                )}
                 <Table>
                   <TableHeader>
                     <TableRow>
