@@ -10,13 +10,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Plus, Trash2, Edit, Package, X, Search, QrCode } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit, Package, X, Search, QrCode, History } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@/components/ui/pagination";
 import { QRCode } from "@/components/ui/qr-code";
 import { QRCodeModal } from "@/components/ui/qr-code-modal";
 import { PhotoUpload } from "@/components/ui/photo-upload";
 import { PhotoViewer } from "@/components/ui/photo-viewer";
+import { StockHistoryModal } from "@/components/ui/stock-history-modal";
 
 interface ConsumptionType {
   id: string;
@@ -30,6 +31,7 @@ interface ConsumptionItem {
   description?: string;
   purchaseDate: string;
   photo?: string;
+  stock: number;
   consumptionType: ConsumptionType;
   createdAt: string;
 }
@@ -68,11 +70,14 @@ export default function Items() {
     purchaseDate: "",
     photo: "",
     consumptionTypeId: "",
+    stock: "0",
   });
   const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
   const [selectedItemForQrCode, setSelectedItemForQrCode] = useState<ConsumptionItem | null>(null);
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; name: string } | null>(null);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [selectedItemForHistory, setSelectedItemForHistory] = useState<ConsumptionItem | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -141,6 +146,7 @@ export default function Items() {
       purchaseDate: "",
       photo: "",
       consumptionTypeId: "",
+      stock: "0",
     });
     setEditingItem(null);
     setShowForm(false);
@@ -154,6 +160,7 @@ export default function Items() {
       purchaseDate: item.purchaseDate.split('T')[0], // Format date for input
       photo: item.photo || "",
       consumptionTypeId: item.consumptionType.id,
+      stock: item.stock.toString(),
     });
     setShowForm(true);
   };
@@ -176,6 +183,7 @@ export default function Items() {
         },
         body: JSON.stringify({
           ...formData,
+          stock: parseInt(formData.stock),
         }),
       });
 
@@ -519,6 +527,17 @@ export default function Items() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="stock">Stock</Label>
+                    <Input
+                      id="stock"
+                      type="number"
+                      placeholder="e.g., 100"
+                      value={formData.stock}
+                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="description">Description (Optional)</Label>
                     <Textarea
                       id="description"
@@ -571,6 +590,7 @@ export default function Items() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Type</TableHead>
+                  <TableHead>Stock</TableHead>
                   <TableHead>Purchase Date</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Photo</TableHead>
@@ -580,7 +600,7 @@ export default function Items() {
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow key={item.id} className={item.stock < 10 ? "bg-red-50" : ""}>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
@@ -590,6 +610,11 @@ export default function Items() {
                           ({item.consumptionType.period.toLowerCase()})
                         </span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`font-bold ${item.stock < 10 ? 'text-red-600' : 'text-gray-900'}`}>
+                        {item.stock}
+                      </span>
                     </TableCell>
                     <TableCell>
                       {formatDate(item.purchaseDate)}
@@ -642,13 +667,23 @@ export default function Items() {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedItemForHistory(item);
+                            setHistoryModalOpen(true);
+                          }}
+                        >
+                          <History className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
                 ))}
                 {items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={8} className="text-center text-gray-500 py-8">
                       {searchTerm || selectedTypeId !== "all" ? "No items found matching your criteria." : "No items found. Create your first one above."}
                     </TableCell>
                   </TableRow>
@@ -681,6 +716,15 @@ export default function Items() {
         photoUrl={selectedPhoto?.url || ""}
         itemName={selectedPhoto?.name || ""}
       />
+
+      {selectedItemForHistory && (
+        <StockHistoryModal
+          isOpen={historyModalOpen}
+          onClose={() => setHistoryModalOpen(false)}
+          itemId={selectedItemForHistory.id}
+          itemName={selectedItemForHistory.name}
+        />
+      )}
     </div>
   );
 }

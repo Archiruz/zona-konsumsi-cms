@@ -18,7 +18,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, description, purchaseDate, photo, consumptionTypeId } = body;
+    const { name, description, purchaseDate, photo, consumptionTypeId, stock } = body;
 
     if (!name || !consumptionTypeId || !purchaseDate) {
       return NextResponse.json(
@@ -27,18 +27,45 @@ export async function PUT(
       );
     }
 
-    const updatedItem = await prisma.consumptionItem.update({
+    const existingItem = await prisma.consumptionItem.findUnique({
       where: { id },
-      data: {
-        name,
-        description,
-        purchaseDate: new Date(purchaseDate),
-        photo,
-        consumptionTypeId,
-      },
-      include: {
-        consumptionType: true,
-      },
+    });
+
+    if (!existingItem) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    }
+
+    const updatedStock = stock !== undefined ? parseInt(stock) : existingItem.stock;
+    const stockChange = updatedStock - existingItem.stock;
+
+    const [updatedItem] = await prisma.$transaction(async (tx) => {
+      const item = await tx.consumptionItem.update({
+        where: { id },
+        data: {
+          name,
+          description,
+          purchaseDate: new Date(purchaseDate),
+          photo,
+          consumptionTypeId,
+          stock: updatedStock,
+        },
+        include: {
+          consumptionType: true,
+        },
+      });
+
+      if (stockChange !== 0) {
+        await tx.stockAdjustment.create({
+          data: {
+            itemId: id,
+            change: stockChange,
+            reason: "Manual adjustment by admin",
+            userId: session.user.id,
+          },
+        });
+      }
+
+      return [item];
     });
 
     return NextResponse.json(updatedItem);

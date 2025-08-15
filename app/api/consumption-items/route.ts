@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, purchaseDate, photo, consumptionTypeId } = body;
+    const { name, description, purchaseDate, photo, consumptionTypeId, stock } = body;
 
     if (!name || !consumptionTypeId) {
       return NextResponse.json(
@@ -89,6 +89,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const initialStock = stock ? parseInt(stock) : 0;
+
     const item = await prisma.consumptionItem.create({
       data: {
         name,
@@ -96,11 +98,23 @@ export async function POST(request: NextRequest) {
         purchaseDate: new Date(purchaseDate),
         photo,
         consumptionTypeId,
+        stock: initialStock,
       },
       include: {
         consumptionType: true,
       },
     });
+
+    if (initialStock > 0) {
+      await prisma.stockAdjustment.create({
+        data: {
+          itemId: item.id,
+          change: initialStock,
+          reason: "Initial stock",
+          userId: session.user.id,
+        },
+      });
+    }
 
     return NextResponse.json(item, { status: 201 });
   } catch (error) {

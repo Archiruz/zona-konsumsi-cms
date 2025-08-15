@@ -19,7 +19,7 @@ interface ConsumptionItem {
   name: string;
   description?: string;
   photo?: string;
-  quantity: number;
+  stock: number;
   consumptionType: {
     id: string;
     name: string;
@@ -232,8 +232,8 @@ export default function ScanQR() {
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Available Quantity</Label>
-                    <p className="text-lg font-semibold text-green-600">{scannedItem.quantity}</p>
+                    <Label className="text-sm font-medium text-gray-700">Available Stock</Label>
+                    <p className="text-lg font-semibold text-green-600">{scannedItem.stock}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-700">Type</Label>
@@ -261,13 +261,13 @@ export default function ScanQR() {
                       id="quantity"
                       type="number"
                       min="1"
-                      max={scannedItem.quantity}
+                      max={scannedItem.stock}
                       value={formData.quantity}
                       onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                       required
                     />
                     <p className="text-xs text-gray-500">
-                      Maximum: {scannedItem.quantity}
+                      Maximum: {scannedItem.stock}
                     </p>
                   </div>
                   <div className="space-y-2">

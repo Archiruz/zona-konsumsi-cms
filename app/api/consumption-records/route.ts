@@ -125,6 +125,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (item.stock < quantity) {
+      return NextResponse.json(
+        { error: "Insufficient stock" },
+        { status: 400 }
+      );
+    }
+
     // Cek batas pengambilan berdasarkan periode
     const now = new Date();
     let startDate: Date;
@@ -154,24 +161,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create consumption record
-    const record = await prisma.consumptionRecord.create({
-      data: {
-        userId: session.user.id,
-        itemId: itemId,
-        quantity: quantity,
-        photo: photo,
-        notes: notes,
-      },
-      include: {
-        user: true,
-        item: {
-          include: {
-            consumptionType: true,
+    // Create consumption record and update stock in a transaction
+    const [record] = await prisma.$transaction([
+      prisma.consumptionRecord.create({
+        data: {
+          userId: session.user.id,
+          itemId: itemId,
+          quantity: quantity,
+          photo: photo,
+          notes: notes,
+        },
+        include: {
+          user: true,
+          item: {
+            include: {
+              consumptionType: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.consumptionItem.update({
+        where: { id: itemId },
+        data: {
+          stock: {
+            decrement: quantity,
+          },
+        },
+      }),
+    ]);
 
     return NextResponse.json(record, { status: 201 });
   } catch (error) {
