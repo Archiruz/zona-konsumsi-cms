@@ -18,6 +18,7 @@ import { QRCodeModal } from "@/components/ui/qr-code-modal";
 import { PhotoUpload } from "@/components/ui/photo-upload";
 import { PhotoViewer } from "@/components/ui/photo-viewer";
 import { StockHistoryModal } from "@/components/ui/stock-history-modal";
+import QRCodeLib from "qrcode";
 
 interface ConsumptionType {
   id: string;
@@ -253,30 +254,37 @@ export default function Items() {
     }
   };
 
-  const printAllQRCodes = () => {
+  const printAllQRCodes = async () => {
     try {
+      const qrCodePromises = items.map(item => 
+        QRCodeLib.toDataURL(item.id, {
+          errorCorrectionLevel: 'M',
+          margin: 2,
+          scale: 4,
+        })
+      );
+      
+      const qrCodeDataUrls = await Promise.all(qrCodePromises);
+
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
         toast.error("Please allow popups to print QR codes");
         return;
       }
 
-      const qrCodesHTML = items.map(item => `
+      const qrCodesHTML = items.map((item, index) => `
         <div style="display: inline-block; margin: 10px; text-align: center; page-break-inside: avoid;">
           <div style="border: 1px solid #ccc; padding: 10px; background: white;">
-            <div id="qr-${item.id}"></div>
+            <img src="${qrCodeDataUrls[index]}" alt="QR Code for ${item.name}" width="128" height="128" />
             <div style="margin-top: 5px; font-size: 12px; font-weight: bold;">${item.name}</div>
             <div style="font-size: 10px; color: #666;">ID: ${item.id}</div>
           </div>
         </div>
       `).join('');
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
+      printWindow.document.documentElement.innerHTML = `
         <head>
           <title>QR Codes - ${items.length} Items</title>
-          <script src="https://unpkg.com/qrcode.react@3.1.0/lib/index.umd.js"></script>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             @media print { 
@@ -292,32 +300,12 @@ export default function Items() {
           <div style="text-align: center;">
             ${qrCodesHTML}
           </div>
-          <script>
-            // Generate QR codes after page loads
-            window.onload = function() {
-              ${items.map(item => `
-                const qrContainer = document.getElementById('qr-${item.id}');
-                if (qrContainer) {
-                  const qr = new QRCode(qrContainer, {
-                    text: '${item.id}',
-                    width: 128,
-                    height: 128,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
-                  });
-                }
-              `).join('')}
-            };
-          </script>
         </body>
-        </html>
-      `);
+      `;
 
-      printWindow.document.close();
       toast.success("Print window opened. Generate QR codes and print them.");
     } catch (error) {
-      toast.error("Failed to open print window");
+      toast.error("Failed to generate QR codes for printing");
     }
   };
 
