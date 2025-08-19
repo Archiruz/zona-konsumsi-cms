@@ -89,9 +89,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    await prisma.consumptionItem.delete({
-      where: { id },
-    });
+    await prisma.consumptionItem.delete({ where: { id } });
 
     return NextResponse.json({ message: "Consumption item deleted successfully" });
   } catch (error) {

@@ -58,9 +58,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    await prisma.consumptionType.delete({
-      where: { id },
-    });
+    await prisma.consumptionType.delete({ where: { id } });
 
     return NextResponse.json({ message: "Consumption type deleted successfully" });
   } catch (error) {

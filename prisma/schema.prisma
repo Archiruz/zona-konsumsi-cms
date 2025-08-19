@@ -45,7 +45,7 @@ model ConsumptionItem {
   purchaseDate      DateTime
   photo             String?
   consumptionTypeId String
-  consumptionType   ConsumptionType     @relation(fields: [consumptionTypeId], references: [id])
+  consumptionType   ConsumptionType     @relation(fields: [consumptionTypeId], references: [id], onDelete: Cascade)
   records           ConsumptionRecord[]
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -68,7 +68,7 @@ model ConsumptionRecord {
 
   // Relations
   user   User   @relation(fields: [userId], references: [id])
-  item   ConsumptionItem @relation(fields: [itemId], references: [id])
+  item   ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([itemId])
@@ -81,7 +81,7 @@ model StockAdjustment {
   createdAt DateTime @default(now())
 
   itemId String
-  item   ConsumptionItem @relation(fields: [itemId], references: [id])
+  item   ConsumptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   userId String
   user   User            @relation(fields: [userId], references: [id])
 
