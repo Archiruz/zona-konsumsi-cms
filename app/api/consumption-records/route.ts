@@ -21,14 +21,25 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const startDate = searchParams.get('startDate') || '';
     const endDate = searchParams.get('endDate') || '';
+    const userIdParam = searchParams.get('userId') || '';
     
     const skip = (page - 1) * limit;
     
     // Build where clause for search and filtering
     const where: any = {};
     
-    if (session.user.role !== "ADMIN") {
-      // Employee hanya bisa lihat record sendiri
+    // Apply user scoping rules
+    if (userIdParam) {
+      // If userId is provided, ensure non-admins can only query themselves
+      if (session.user.role !== "ADMIN" && userIdParam !== session.user.id) {
+        return NextResponse.json(
+          { error: "Forbidden" },
+          { status: 403 }
+        );
+      }
+      where.userId = userIdParam;
+    } else if (session.user.role !== "ADMIN") {
+      // Non-admins are always restricted to their own records
       where.userId = session.user.id;
     }
     

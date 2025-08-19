@@ -107,6 +107,11 @@ export default function MyRecords() {
         params.append('endDate', endDate);
       }
       
+      // Always scope to current user on my-records page, including admins
+      if (session?.user?.id) {
+        params.append('userId', session.user.id);
+      }
+      
       const response = await fetch(`/api/consumption-records?${params}`);
       if (response.ok) {
         const result = await response.json();
