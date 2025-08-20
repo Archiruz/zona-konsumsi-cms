@@ -37,19 +37,29 @@ export function PhotoUpload({ value, onChange, label = "Photo", placeholder = "E
     setIsUploading(true);
 
     try {
-      // For now, we'll create a data URL (in production, you'd upload to a service like Cloudinary)
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setPreviewUrl(result);
-        onChange(result);
-        setIsUploading(false);
-        toast.success("Photo uploaded successfully");
-      };
-      reader.readAsDataURL(file);
+      // Upload to Vercel Blob storage
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
+
+      const result = await response.json();
+      setPreviewUrl(result.url);
+      onChange(result.url);
+      toast.success("Photo uploaded successfully");
     } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to upload photo");
+    } finally {
       setIsUploading(false);
-      toast.error("Failed to upload photo");
     }
   };
 
@@ -58,7 +68,20 @@ export function PhotoUpload({ value, onChange, label = "Photo", placeholder = "E
     setPreviewUrl(url);
   };
 
-  const handleRemovePhoto = () => {
+  const handleRemovePhoto = async () => {
+    // If it's a blob URL, we could optionally clean it up
+    // Note: Vercel Blob free tier auto-cleans unused files after 30 days
+    if (previewUrl && previewUrl.includes('blob.vercel-storage.com')) {
+      try {
+        await fetch(`/api/upload?url=${encodeURIComponent(previewUrl)}`, {
+          method: "DELETE",
+        });
+      } catch (error) {
+        // Silently handle cleanup errors as they're not critical
+        console.log("Cleanup note:", error);
+      }
+    }
+
     onChange("");
     setPreviewUrl(null);
     if (fileInputRef.current) {
