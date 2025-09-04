@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, QrCode, Users, BarChart3 } from "lucide-react";
+import { AdSenseBanner, AdSenseRectangle, AdSenseResponsive } from "@/components/ui/adsense";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -72,63 +73,84 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="text-center">
-            <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <QrCode className="h-6 w-6 text-blue-600" />
-              </div>
-              <CardTitle>Pemindaian QR Code</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Pelacakan item yang cepat dan mudah dengan teknologi QR code
-              </CardDescription>
-            </CardContent>
-          </Card>
+        {/* Top Banner Ad */}
+        <div className="flex justify-center mb-8">
+          <AdSenseBanner adSlot="1234567890" className="max-w-4xl w-full" />
+        </div>
 
-          <Card className="text-center">
-            <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle>Manajemen Pengguna</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Kontrol akses berbasis peran untuk admin dan karyawan
-              </CardDescription>
-            </CardContent>
-          </Card>
+        {/* Features Grid with Sidebar Ad */}
+        <div className="flex gap-8 mb-16">
+          <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <QrCode className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <CardTitle>Pemindaian QR Code</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Pelacakan item yang cepat dan mudah dengan teknologi QR code
+                  </CardDescription>
+                </CardContent>
+              </Card>
 
-          <Card className="text-center">
-            <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="h-6 w-6 text-purple-600" />
-              </div>
-              <CardTitle>Analitik & Laporan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Kemampuan pelacakan dan pelaporan yang komprehensif
-              </CardDescription>
-            </CardContent>
-          </Card>
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <Users className="h-6 w-6 text-green-600" />
+                  </div>
+                  <CardTitle>Manajemen Pengguna</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Kontrol akses berbasis peran untuk admin dan karyawan
+                  </CardDescription>
+                </CardContent>
+              </Card>
 
-          <Card className="text-center">
-            <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Package className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Kontrol Inventaris</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Manajemen inventaris real-time dan penegakan batasan
-              </CardDescription>
-            </CardContent>
-          </Card>
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <BarChart3 className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <CardTitle>Analitik & Laporan</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Kemampuan pelacakan dan pelaporan yang komprehensif
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="mx-auto w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                    <Package className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <CardTitle>Kontrol Inventaris</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Manajemen inventaris real-time dan penegakan batasan
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          
+          {/* Sidebar Ad */}
+          <div className="hidden lg:block w-80 flex-shrink-0">
+            <div className="sticky top-8">
+              <AdSenseRectangle adSlot="0987654321" className="mx-auto" />
+            </div>
+          </div>
+        </div>
+
+        {/* Middle Banner Ad */}
+        <div className="flex justify-center mb-8">
+          <AdSenseResponsive adSlot="1122334455" className="max-w-4xl w-full" />
         </div>
 
         {/* How It Works */}
@@ -171,6 +193,11 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Bottom Banner Ad */}
+        <div className="flex justify-center mb-8">
+          <AdSenseBanner adSlot="5566778899" className="max-w-4xl w-full" />
+        </div>
 
         {/* CTA Section */}
         <div className="text-center">
