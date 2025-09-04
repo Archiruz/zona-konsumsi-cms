@@ -77,7 +77,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
           },
           (decodedText: string) => {
             // Successfully scanned
-            toast.success("QR Code scanned successfully!");
+            toast.success("Kode QR berhasil di-scan!");
             onScan(decodedText);
             stopScanning();
           },
@@ -87,19 +87,19 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
           }
         );
       } else {
-        throw new Error("No cameras found");
+        throw new Error("Tidak ada kamera ditemukan");
       }
     } catch (err: any) {
       console.error("Scanner error:", err);
-      setError(err.message || "Failed to start camera");
+      setError(err.message || "Gagal memulai kamera");
       setIsScanning(false);
       
       if (err.message?.includes("Permission")) {
-        toast.error("Camera permission denied. Please allow camera access.");
+        toast.error("Izin kamera ditolak. Silakan izinkan akses kamera.");
       } else if (err.message?.includes("No cameras")) {
-        toast.error("No cameras found on this device.");
+        toast.error("Tidak ada kamera ditemukan pada perangkat ini.");
       } else {
-        toast.error("Failed to start camera scanner.");
+        toast.error("Gagal memulai scanner kamera.");
       }
     }
   };
@@ -134,7 +134,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Scan QR Code</h3>
+          <h3 className="text-lg font-semibold">Scan Kode QR</h3>
           <Button
             variant="ghost"
             size="sm"
@@ -152,10 +152,10 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 <QrCode className="h-20 w-20 text-gray-400" />
               </div>
               <p className="text-gray-600 mb-6 text-lg">
-                Click the button below to start scanning QR codes with your camera
+                Klik tombol di bawah untuk memulai pindai kode QR dengan kamera Anda
               </p>
               <p className="text-sm text-gray-500 mb-4">
-                The scanner will automatically try to use the back camera for better QR code scanning
+                Scanner akan secara otomatis mencoba menggunakan kamera belakang untuk memindai kode QR
               </p>
               <Button
                 onClick={startScanning}
@@ -163,27 +163,27 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 size="lg"
               >
                 <Camera className="h-5 w-5" />
-                <span>Start Camera Scanner</span>
+                <span>Mulai Scanner Kamera</span>
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="text-center">
                 <p className="text-gray-600 mb-3 text-lg font-medium">
-                  Point your camera at a QR code
+                  Arahkan kamera Anda ke kode QR
                 </p>
                 <p className="text-sm text-gray-500">
-                  The scanner will automatically detect and read QR codes
+                  Scanner akan secara otomatis mendeteksi dan membaca kode QR
                 </p>
               </div>
               
               {/* Camera Selection */}
               {cameras.length > 1 && (
                 <div className="flex flex-col items-center space-y-3">
-                  <p className="text-sm text-gray-600">Select Camera:</p>
+                  <p className="text-sm text-gray-600">Pilih Kamera:</p>
                   <Select value={selectedCamera?.id} onValueChange={switchCamera}>
                     <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Select camera" />
+                      <SelectValue placeholder="Pilih kamera" />
                     </SelectTrigger>
                     <SelectContent>
                       {cameras.map((camera) => (
@@ -195,7 +195,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   </Select>
                   {selectedCamera && (
                     <p className="text-xs text-gray-500">
-                      Using: {selectedCamera.label || `Camera ${selectedCamera.id.slice(0, 8)}...`}
+                      Menggunakan: {selectedCamera.label || `Kamera ${selectedCamera.id.slice(0, 8)}...`}
                     </p>
                   )}
                 </div>
@@ -216,7 +216,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                   className="flex items-center space-x-2"
                 >
                   <X className="h-4 w-4" />
-                  <span>Stop Scanner</span>
+                  <span>Stop Scanner Kamera</span>
                 </Button>
                 {cameras.length > 1 && (
                   <Button
@@ -229,7 +229,7 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                     className="flex items-center space-x-2"
                   >
                     <RotateCcw className="h-4 w-4" />
-                    <span>Switch Camera</span>
+                    <span>Ganti Kamera</span>
                   </Button>
                 )}
               </div>
@@ -242,14 +242,14 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
                 <strong>Error:</strong> {error}
               </p>
               <p className="text-red-600 text-xs mt-1">
-                Try refreshing the page or checking your camera permissions.
+                Silakan refresh halaman atau periksa izin kamera Anda.
               </p>
             </div>
           )}
 
           <div className="text-center text-xs text-gray-500 pt-4 border-t">
-            <p className="mb-1">Make sure you have a working camera and have granted camera permissions.</p>
-            <p>QR codes should contain the item ID for quick scanning.</p>
+            <p className="mb-1">Pastikan Anda memiliki kamera yang bekerja dan telah memberikan izin kamera.</p>
+            <p>Kode QR harus berisi ID barang agar bisa di-scan.</p>
           </div>
         </div>
       </div>

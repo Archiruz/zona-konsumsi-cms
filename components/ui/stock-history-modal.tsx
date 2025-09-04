@@ -76,7 +76,7 @@ export function StockHistoryModal({ isOpen, onClose, itemId, itemName }: StockHi
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleString('en-US', {
+      return new Date(dateString).toLocaleString('id-ID', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -94,27 +94,27 @@ export function StockHistoryModal({ isOpen, onClose, itemId, itemName }: StockHi
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Package className="h-6 w-6" />
-            <span>Stock History: {itemName}</span>
+            <span>Riwayat Stok: {itemName}</span>
           </DialogTitle>
           <DialogDescription>
-            A log of all stock adjustments for this item.
+            Riwayat penyesuaian stok untuk item ini.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4">
           {isLoading && adjustments.length === 0 ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading history...</p>
+              <p className="mt-2 text-gray-600">Memuat riwayat...</p>
             </div>
           ) : (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
+                    <TableHead>Tanggal</TableHead>
                     <TableHead>User</TableHead>
-                    <TableHead>Change</TableHead>
-                    <TableHead>Reason</TableHead>
+                    <TableHead>Selisih</TableHead>
+                    <TableHead>Alasan</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -148,7 +148,7 @@ export function StockHistoryModal({ isOpen, onClose, itemId, itemName }: StockHi
                   {adjustments.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={4} className="text-center text-gray-500 py-8">
-                        No stock adjustments found for this item.
+                        Tidak ada penyesuaian stok untuk item ini.
                       </TableCell>
                     </TableRow>
                   )}
