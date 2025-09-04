@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch consumption types" },
+      { error: "Gagal mengambil data tipe konsumsi" },
       { status: 500 }
     );
   }
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Tidak memiliki akses" },
         { status: 401 }
       );
     }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     if (!name || !limit || !period) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Field yang diperlukan tidak lengkap" },
         { status: 400 }
       );
     }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(type, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to create consumption type" },
+      { error: "Gagal membuat tipe konsumsi" },
       { status: 500 }
     );
   }

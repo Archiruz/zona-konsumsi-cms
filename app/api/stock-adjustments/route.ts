@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!itemId || change === undefined) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Field yang diperlukan tidak lengkap" },
         { status: 400 }
       );
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const changeAmount = parseInt(change);
     if (isNaN(changeAmount)) {
       return NextResponse.json(
-        { error: "Invalid change amount" },
+        { error: "Jumlah perubahan tidak valid" },
         { status: 400 }
       );
     }
@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!item) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ error: "Item tidak ditemukan" }, { status: 404 });
     }
 
     if (item.stock + changeAmount < 0) {
       return NextResponse.json(
-        { error: "Stock cannot be negative" },
+        { error: "Stok tidak boleh negatif" },
         { status: 400 }
       );
     }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating stock adjustment:", error);
     return NextResponse.json(
-      { error: "Failed to create stock adjustment" },
+      { error: "Gagal membuat penyesuaian stok" },
       { status: 500 }
     );
   }

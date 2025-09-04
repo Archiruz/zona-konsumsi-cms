@@ -11,7 +11,7 @@ export async function PUT(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -21,14 +21,14 @@ export async function PUT(
     // Validation
     if (!name || !email || !role) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Field yang diperlukan tidak lengkap" },
         { status: 400 }
       );
     }
 
     if (role !== "ADMIN" && role !== "EMPLOYEE") {
       return NextResponse.json(
-        { error: "Invalid role" },
+        { error: "Role tidak valid" },
         { status: 400 }
       );
     }
@@ -40,7 +40,7 @@ export async function PUT(
 
     if (!existingUser) {
       return NextResponse.json(
-        { error: "User not found" },
+        { error: "Pengguna tidak ditemukan" },
         { status: 404 }
       );
     }
@@ -53,7 +53,7 @@ export async function PUT(
 
       if (emailTaken) {
         return NextResponse.json(
-          { error: "Email already taken by another user" },
+          { error: "Email sudah digunakan oleh pengguna lain" },
           { status: 400 }
         );
       }
@@ -89,7 +89,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Kesalahan server internal" },
       { status: 500 }
     );
   }
@@ -103,7 +103,7 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -111,7 +111,7 @@ export async function DELETE(
     // Prevent admin from deleting themselves
     if (id === session.user.id) {
       return NextResponse.json(
-        { error: "Cannot delete your own account" },
+        { error: "Tidak dapat menghapus akun Anda sendiri" },
         { status: 400 }
       );
     }
@@ -123,7 +123,7 @@ export async function DELETE(
 
     if (!existingUser) {
       return NextResponse.json(
-        { error: "User not found" },
+        { error: "Pengguna tidak ditemukan" },
         { status: 404 }
       );
     }
@@ -135,7 +135,7 @@ export async function DELETE(
 
     if (hasRecords) {
       return NextResponse.json(
-        { error: "Cannot delete user with consumption records. Consider deactivating instead." },
+        { error: "Tidak dapat menghapus pengguna yang memiliki record konsumsi. Pertimbangkan untuk menonaktifkan saja." },
         { status: 400 }
       );
     }
@@ -145,11 +145,11 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: "User deleted successfully" });
+    return NextResponse.json({ message: "Pengguna berhasil dihapus" });
   } catch (error) {
     console.error("Error deleting user:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Kesalahan server internal" },
       { status: 500 }
     );
   }

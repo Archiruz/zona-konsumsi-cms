@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     // Get the file from the request
@@ -16,17 +16,17 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return NextResponse.json({ error: "File tidak disediakan" }, { status: 400 });
     }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image" }, { status: 400 });
+      return NextResponse.json({ error: "File harus berupa gambar" }, { status: 400 });
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 });
+      return NextResponse.json({ error: "Ukuran file harus kurang dari 5MB" }, { status: 400 });
     }
 
     // Generate a unique filename
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: "Failed to upload file" },
+      { error: "Gagal mengunggah file" },
       { status: 500 }
     );
   }
@@ -56,25 +56,25 @@ export async function DELETE(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const url = searchParams.get("url");
 
     if (!url) {
-      return NextResponse.json({ error: "No URL provided" }, { status: 400 });
+      return NextResponse.json({ error: "URL tidak disediakan" }, { status: 400 });
     }
 
     // Note: Vercel Blob doesn't have a direct delete API in the free tier
     // The blob will be automatically cleaned up after 30 days if unused
     // For production, you might want to implement a cleanup mechanism
     
-    return NextResponse.json({ message: "File marked for deletion" });
+    return NextResponse.json({ message: "File ditandai untuk dihapus" });
   } catch (error) {
     console.error("Delete error:", error);
     return NextResponse.json(
-      { error: "Failed to delete file" },
+      { error: "Gagal menghapus file" },
       { status: 500 }
     );
   }

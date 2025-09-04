@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     
     if (!session) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Tidak memiliki akses" },
         { status: 401 }
       );
     }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       // If userId is provided, ensure non-admins can only query themselves
       if (session.user.role !== "ADMIN" && userIdParam !== session.user.id) {
         return NextResponse.json(
-          { error: "Forbidden" },
+          { error: "Akses ditolak" },
           { status: 403 }
         );
       }
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch consumption records" },
+      { error: "Gagal mengambil data record konsumsi" },
       { status: 500 }
     );
   }
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     
     if (!session) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Tidak memiliki akses" },
         { status: 401 }
       );
     }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     if (!itemId || !quantity || !photo) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Field yang diperlukan tidak lengkap" },
         { status: 400 }
       );
     }
@@ -129,14 +129,14 @@ export async function POST(request: NextRequest) {
 
     if (!item) {
       return NextResponse.json(
-        { error: "Item not found" },
+        { error: "Item tidak ditemukan" },
         { status: 404 }
       );
     }
 
     if (item.stock < quantity) {
       return NextResponse.json(
-        { error: "Insufficient stock" },
+        { error: "Stok tidak mencukupi" },
         { status: 400 }
       );
     }
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     
     if (totalTaken + quantity > item.consumptionType.limit) {
       return NextResponse.json(
-        { error: `Exceeds limit of ${item.consumptionType.limit} per ${item.consumptionType.period.toLowerCase()}` },
+        { error: `Melebihi batas ${item.consumptionType.limit} per ${item.consumptionType.period.toLowerCase()}` },
         { status: 400 }
       );
     }
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(record, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to create consumption record" },
+      { error: "Gagal membuat record konsumsi" },
       { status: 500 }
     );
   }

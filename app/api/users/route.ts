@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Kesalahan server internal" },
       { status: 500 }
     );
   }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -83,14 +83,14 @@ export async function POST(request: NextRequest) {
     // Validation
     if (!name || !email || !password || !role) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Field yang diperlukan tidak lengkap" },
         { status: 400 }
       );
     }
 
     if (role !== "ADMIN" && role !== "EMPLOYEE") {
       return NextResponse.json(
-        { error: "Invalid role" },
+        { error: "Role tidak valid" },
         { status: 400 }
       );
     }
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "User with this email already exists" },
+        { error: "Pengguna dengan email ini sudah ada" },
         { status: 400 }
       );
     }
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating user:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Kesalahan server internal" },
       { status: 500 }
     );
   }

@@ -12,7 +12,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { itemId } = await params;
@@ -59,7 +59,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching stock adjustments:", error);
     return NextResponse.json(
-      { error: "Failed to fetch stock adjustments" },
+      { error: "Gagal mengambil data penyesuaian stok" },
       { status: 500 }
     );
   }

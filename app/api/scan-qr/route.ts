@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!itemId) {
       return NextResponse.json(
-        { error: "Item ID is required" },
+        { error: "ID Item diperlukan" },
         { status: 400 }
       );
     }
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     if (!item) {
       return NextResponse.json(
-        { error: "Item not found" },
+        { error: "Item tidak ditemukan" },
         { status: 404 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(item);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to scan QR code" },
+      { error: "Gagal memindai kode QR" },
       { status: 500 }
     );
   }

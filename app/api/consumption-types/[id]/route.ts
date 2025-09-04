@@ -11,7 +11,7 @@ export async function PUT(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -20,7 +20,7 @@ export async function PUT(
 
     if (!name || !limit || !period) {
       return NextResponse.json(
-        { error: "Name, limit, and period are required" },
+        { error: "Nama, batas, dan periode harus diisi" },
         { status: 400 }
       );
     }
@@ -39,7 +39,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating consumption type:", error);
     return NextResponse.json(
-      { error: "Failed to update consumption type" },
+      { error: "Gagal memperbarui tipe konsumsi" },
       { status: 500 }
     );
   }
@@ -53,18 +53,18 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
 
     await prisma.consumptionType.delete({ where: { id } });
 
-    return NextResponse.json({ message: "Consumption type deleted successfully" });
+    return NextResponse.json({ message: "Tipe konsumsi berhasil dihapus" });
   } catch (error) {
     console.error("Error deleting consumption type:", error);
     return NextResponse.json(
-      { error: "Failed to delete consumption type" },
+      { error: "Gagal menghapus tipe konsumsi" },
       { status: 500 }
     );
   }

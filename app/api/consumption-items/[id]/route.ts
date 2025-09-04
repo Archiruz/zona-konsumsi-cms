@@ -11,7 +11,7 @@ export async function PUT(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -20,7 +20,7 @@ export async function PUT(
 
     if (!name || !consumptionTypeId || !purchaseDate) {
       return NextResponse.json(
-        { error: "Name, type, and purchase date are required" },
+        { error: "Nama, tipe, dan tanggal pembelian harus diisi" },
         { status: 400 }
       );
     }
@@ -30,7 +30,7 @@ export async function PUT(
     });
 
     if (!existingItem) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ error: "Item tidak ditemukan" }, { status: 404 });
     }
 
     const updatedStock = stock !== undefined ? parseInt(stock) : existingItem.stock;
@@ -57,7 +57,7 @@ export async function PUT(
           data: {
             itemId: id,
             change: stockChange,
-            reason: "Manual adjustment by admin",
+            reason: "Penyesuaian manual oleh admin",
             userId: session.user.id,
           },
         });
@@ -70,7 +70,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating consumption item:", error);
     return NextResponse.json(
-      { error: "Failed to update consumption item" },
+      { error: "Gagal memperbarui item konsumsi" },
       { status: 500 }
     );
   }
@@ -84,18 +84,18 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
     const { id } = await params;
 
     await prisma.consumptionItem.delete({ where: { id } });
 
-    return NextResponse.json({ message: "Consumption item deleted successfully" });
+    return NextResponse.json({ message: "Item konsumsi berhasil dihapus" });
   } catch (error) {
     console.error("Error deleting consumption item:", error);
     return NextResponse.json(
-      { error: "Failed to delete consumption item" },
+      { error: "Gagal menghapus item konsumsi" },
       { status: 500 }
     );
   }
