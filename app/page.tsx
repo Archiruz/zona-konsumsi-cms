@@ -75,7 +75,7 @@ export default function Home() {
 
         {/* Top Banner Ad */}
         <div className="flex justify-center mb-8">
-          <AdSenseBanner adSlot="1234567890" className="max-w-4xl w-full" />
+          <AdSenseBanner adSlot="4664376888" className="max-w-4xl w-full" />
         </div>
 
         {/* Features Grid with Sidebar Ad */}
@@ -143,14 +143,14 @@ export default function Home() {
           {/* Sidebar Ad */}
           <div className="hidden lg:block w-80 flex-shrink-0">
             <div className="sticky top-8">
-              <AdSenseRectangle adSlot="0987654321" className="mx-auto" />
+              <AdSenseRectangle adSlot="4664376888" className="mx-auto" />
             </div>
           </div>
         </div>
 
         {/* Middle Banner Ad */}
         <div className="flex justify-center mb-8">
-          <AdSenseResponsive adSlot="1122334455" className="max-w-4xl w-full" />
+          <AdSenseResponsive adSlot="4664376888" className="max-w-4xl w-full" />
         </div>
 
         {/* How It Works */}
@@ -196,7 +196,7 @@ export default function Home() {
 
         {/* Bottom Banner Ad */}
         <div className="flex justify-center mb-8">
-          <AdSenseBanner adSlot="5566778899" className="max-w-4xl w-full" />
+          <AdSenseBanner adSlot="4664376888" className="max-w-4xl w-full" />
         </div>
 
         {/* CTA Section */}
