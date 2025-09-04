@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
+    const { id } = await params;
     const department = await prisma.department.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         users: {
           select: {
@@ -49,7 +50,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -58,6 +59,7 @@ export async function PUT(
       return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { name, description } = body;
 
@@ -71,7 +73,7 @@ export async function PUT(
 
     // Check if department exists
     const existingDepartment = await prisma.department.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingDepartment) {
@@ -85,7 +87,7 @@ export async function PUT(
     const nameConflict = await prisma.department.findFirst({
       where: {
         name: name.trim(),
-        id: { not: params.id },
+        id: { not: id },
       },
     });
 
@@ -98,7 +100,7 @@ export async function PUT(
 
     // Update department
     const department = await prisma.department.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: name.trim(),
         description: description?.trim() || null,
@@ -129,7 +131,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -138,9 +140,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Tidak memiliki akses" }, { status: 401 });
     }
 
+    const { id } = await params;
     // Check if department exists
     const existingDepartment = await prisma.department.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         users: true,
       },
@@ -163,7 +166,7 @@ export async function DELETE(
 
     // Delete department
     await prisma.department.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Departemen berhasil dihapus" });
