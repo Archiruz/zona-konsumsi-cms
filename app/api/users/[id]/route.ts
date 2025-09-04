@@ -16,7 +16,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, role, nip, position, departmentId } = body;
 
     // Validation
     if (!name || !email || !role) {
@@ -31,6 +31,28 @@ export async function PUT(
         { error: "Role tidak valid" },
         { status: 400 }
       );
+    }
+
+    // Validate NIP format if provided
+    if (nip && (!/^\d{9}$/.test(nip))) {
+      return NextResponse.json(
+        { error: "NIP harus berupa 9 digit angka" },
+        { status: 400 }
+      );
+    }
+
+    // Validate department exists if provided
+    if (departmentId) {
+      const department = await prisma.department.findUnique({
+        where: { id: departmentId },
+      });
+
+      if (!department) {
+        return NextResponse.json(
+          { error: "Departemen tidak ditemukan" },
+          { status: 400 }
+        );
+      }
     }
 
     // Check if user exists
@@ -59,11 +81,28 @@ export async function PUT(
       }
     }
 
+    // Check if NIP is already taken by another user
+    if (nip && nip !== existingUser.nip) {
+      const nipTaken = await prisma.user.findUnique({
+        where: { nip },
+      });
+
+      if (nipTaken) {
+        return NextResponse.json(
+          { error: "NIP sudah digunakan oleh pengguna lain" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Prepare update data
     const updateData: any = {
       name,
       email,
       role,
+      nip: nip || null,
+      position: position?.trim() || null,
+      departmentId: departmentId || null,
     };
 
     // Only update password if provided
@@ -81,6 +120,15 @@ export async function PUT(
         name: true,
         email: true,
         role: true,
+        nip: true,
+        position: true,
+        departmentId: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
       },
     });

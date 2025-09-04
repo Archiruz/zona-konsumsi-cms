@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Package, Users, QrCode, BarChart3, Settings, LogOut, Tag, ClipboardList } from "lucide-react";
+import { Package, Users, QrCode, BarChart3, Settings, LogOut, Tag, ClipboardList, Building } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
@@ -137,6 +137,20 @@ export default function Dashboard() {
                   <div>
                     <h4 className="font-medium text-gray-900">Manajemen Pengguna</h4>
                     <p className="text-sm text-gray-500">Kelola pengguna dan peran</p>
+                  </div>
+                </div>
+              </Link>
+              <Link
+                href="/dashboard/departments"
+                className="p-6 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Building className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">Manajemen Departemen</h4>
+                    <p className="text-sm text-gray-500">Kelola departemen organisasi</p>
                   </div>
                 </div>
               </Link>

@@ -11,18 +11,35 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(EMPLOYEE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lastLogin DateTime?
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  password     String
+  role         Role        @default(EMPLOYEE)
+  nip          String?     @unique // 9-digit employee code
+  position     String?
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  lastLogin    DateTime?
 
   // Relations
   consumptionRecords ConsumptionRecord[]
   stockAdjustments   StockAdjustment[]
+
+  @@index([departmentId])
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users User[]
 }
 
 model ConsumptionType {

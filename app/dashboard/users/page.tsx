@@ -19,8 +19,20 @@ interface User {
   name: string;
   email: string;
   role: "ADMIN" | "EMPLOYEE";
+  nip?: string;
+  position?: string;
+  departmentId?: string;
+  department?: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
   lastLogin?: string;
+}
+
+interface Department {
+  id: string;
+  name: string;
 }
 
 interface PaginationInfo {
@@ -36,6 +48,7 @@ export default function UserManagement() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -60,7 +73,10 @@ export default function UserManagement() {
     name: "",
     email: "",
     password: "",
-    role: "EMPLOYEE" as "ADMIN" | "EMPLOYEE"
+    role: "EMPLOYEE" as "ADMIN" | "EMPLOYEE",
+    nip: "",
+    position: "",
+    departmentId: ""
   });
 
   useEffect(() => {
@@ -91,6 +107,7 @@ export default function UserManagement() {
   useEffect(() => {
     if (session?.user.role === "ADMIN" && mounted && !hasInitialData) {
       fetchUsers();
+      fetchDepartments();
     }
   }, [session, mounted, hasInitialData]);
 
@@ -119,10 +136,28 @@ export default function UserManagement() {
     }
   };
 
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch("/api/departments?limit=1000"); // Get all departments
+      if (response.ok) {
+        const result = await response.json();
+        setDepartments(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
       toast.error("Mohon isi semua kolom yang diperlukan");
+      return;
+    }
+
+    // Validate NIP if provided
+    if (formData.nip && !/^\d{9}$/.test(formData.nip)) {
+      toast.error("NIP harus berupa 9 digit angka");
       return;
     }
 
@@ -133,13 +168,18 @@ export default function UserManagement() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          nip: formData.nip || null,
+          position: formData.position || null,
+          departmentId: formData.departmentId || null,
+        }),
       });
 
       if (response.ok) {
         toast.success("Pengguna berhasil dibuat!");
         setShowCreateModal(false);
-        setFormData({ name: "", email: "", password: "", role: "EMPLOYEE" });
+        setFormData({ name: "", email: "", password: "", role: "EMPLOYEE", nip: "", position: "", departmentId: "" });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -156,6 +196,12 @@ export default function UserManagement() {
     e.preventDefault();
     if (!selectedUser) return;
 
+    // Validate NIP if provided
+    if (formData.nip && !/^\d{9}$/.test(formData.nip)) {
+      toast.error("NIP harus berupa 9 digit angka");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/users/${selectedUser.id}`, {
@@ -167,6 +213,9 @@ export default function UserManagement() {
           name: formData.name,
           email: formData.email,
           role: formData.role,
+          nip: formData.nip || null,
+          position: formData.position || null,
+          departmentId: formData.departmentId || null,
           ...(formData.password && { password: formData.password })
         }),
       });
@@ -175,7 +224,7 @@ export default function UserManagement() {
         toast.success("Pengguna berhasil diperbarui!");
         setShowEditModal(false);
         setSelectedUser(null);
-        setFormData({ name: "", email: "", password: "", role: "EMPLOYEE" });
+        setFormData({ name: "", email: "", password: "", role: "EMPLOYEE", nip: "", position: "", departmentId: "" });
         fetchUsers();
       } else {
         const error = await response.json();
@@ -219,7 +268,10 @@ export default function UserManagement() {
       name: user.name,
       email: user.email,
       password: "",
-      role: user.role
+      role: user.role,
+      nip: user.nip || "",
+      position: user.position || "",
+      departmentId: user.departmentId || ""
     });
     setShowEditModal(true);
   };
@@ -419,6 +471,9 @@ export default function UserManagement() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Pengguna</TableHead>
+                      <TableHead>NIP</TableHead>
+                      <TableHead>Posisi</TableHead>
+                      <TableHead>Departemen</TableHead>
                       <TableHead>Peran</TableHead>
                       <TableHead>Dibuat</TableHead>
                       <TableHead>Login Terakhir</TableHead>
@@ -440,6 +495,21 @@ export default function UserManagement() {
                               <div className="text-sm text-gray-500">{user.email}</div>
                             </div>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-gray-600">
+                            {user.nip || "-"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-gray-600">
+                            {user.position || "-"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-gray-600">
+                            {user.department?.name || "-"}
+                          </span>
                         </TableCell>
                         <TableCell>
                           {getRoleBadge(user.role)}
@@ -479,7 +549,7 @@ export default function UserManagement() {
                     ))}
                     {users.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-8">
                           {searchTerm ? "Tidak ada pengguna yang ditemukan sesuai pencarian Anda." : "Tidak ada pengguna yang ditemukan."}
                         </TableCell>
                       </TableRow>
@@ -504,54 +574,103 @@ export default function UserManagement() {
       {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Buat Pengguna Baru</h3>
-            <form onSubmit={handleCreateUser} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nama</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Kata Sandi</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="role">Peran</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
-                    setFormData({ ...formData, role: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-6">Buat Pengguna Baru</h3>
+            <form onSubmit={handleCreateUser} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Nama</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="password">Kata Sandi</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="role">Peran</Label>
+                    <Select
+                      value={formData.role}
+                      onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
+                        setFormData({ ...formData, role: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="nip">NIP (9 digit, opsional)</Label>
+                    <Input
+                      id="nip"
+                      value={formData.nip}
+                      onChange={(e) => setFormData({ ...formData, nip: e.target.value })}
+                      placeholder="123456789"
+                      maxLength={9}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="position">Posisi (opsional)</Label>
+                    <Input
+                      id="position"
+                      value={formData.position}
+                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                      placeholder="Contoh: Manager, Staff, dll"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="department">Departemen (opsional)</Label>
+                    <Select
+                      value={formData.departmentId || "none"}
+                      onValueChange={(value) => 
+                        setFormData({ ...formData, departmentId: value === "none" ? "" : value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih departemen" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Tidak ada departemen</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
               <div className="flex space-x-2 pt-4">
                 <Button type="submit" disabled={isLoading} className="flex-1">
@@ -574,53 +693,102 @@ export default function UserManagement() {
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Edit Pengguna</h3>
-            <form onSubmit={handleEditUser} className="space-y-4">
-              <div>
-                <Label htmlFor="edit-name">Nama</Label>
-                <Input
-                  id="edit-name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-email">Email</Label>
-                <Input
-                  id="edit-email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-password">Kata Sandi (kosongkan untuk mempertahankan yang sekarang)</Label>
-                <Input
-                  id="edit-password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-role">Peran</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
-                    setFormData({ ...formData, role: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-6">Edit Pengguna</h3>
+            <form onSubmit={handleEditUser} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit-name">Nama</Label>
+                    <Input
+                      id="edit-name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-email">Email</Label>
+                    <Input
+                      id="edit-email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-password">Kata Sandi (kosongkan jika tidak ingin mengubah)</Label>
+                    <Input
+                      id="edit-password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-role">Peran</Label>
+                    <Select
+                      value={formData.role}
+                      onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
+                        setFormData({ ...formData, role: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit-nip">NIP (9 digit, opsional)</Label>
+                    <Input
+                      id="edit-nip"
+                      value={formData.nip}
+                      onChange={(e) => setFormData({ ...formData, nip: e.target.value })}
+                      placeholder="123456789"
+                      maxLength={9}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-position">Posisi (opsional)</Label>
+                    <Input
+                      id="edit-position"
+                      value={formData.position}
+                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                      placeholder="Contoh: Manager, Staff, dll"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-department">Departemen (opsional)</Label>
+                    <Select
+                      value={formData.departmentId || "none"}
+                      onValueChange={(value) => 
+                        setFormData({ ...formData, departmentId: value === "none" ? "" : value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih departemen" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Tidak ada departemen</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
               <div className="flex space-x-2 pt-4">
                 <Button type="submit" disabled={isLoading} className="flex-1">

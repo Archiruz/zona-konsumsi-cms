@@ -37,6 +37,15 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         role: true,
+        nip: true,
+        position: true,
+        departmentId: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
         lastLogin: true,
       },
@@ -78,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, role, nip, position, departmentId } = body;
 
     // Validation
     if (!name || !email || !password || !role) {
@@ -95,6 +104,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate NIP format if provided
+    if (nip && (!/^\d{9}$/.test(nip))) {
+      return NextResponse.json(
+        { error: "NIP harus berupa 9 digit angka" },
+        { status: 400 }
+      );
+    }
+
+    // Validate department exists if provided
+    if (departmentId) {
+      const department = await prisma.department.findUnique({
+        where: { id: departmentId },
+      });
+
+      if (!department) {
+        return NextResponse.json(
+          { error: "Departemen tidak ditemukan" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -105,6 +136,20 @@ export async function POST(request: NextRequest) {
         { error: "Pengguna dengan email ini sudah ada" },
         { status: 400 }
       );
+    }
+
+    // Check if NIP already exists
+    if (nip) {
+      const existingNip = await prisma.user.findUnique({
+        where: { nip },
+      });
+
+      if (existingNip) {
+        return NextResponse.json(
+          { error: "NIP sudah digunakan oleh pengguna lain" },
+          { status: 400 }
+        );
+      }
     }
 
     // Hash password
@@ -118,12 +163,24 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role,
+        nip: nip || null,
+        position: position?.trim() || null,
+        departmentId: departmentId || null,
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        nip: true,
+        position: true,
+        departmentId: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
       },
     });
