@@ -119,10 +119,10 @@ export default function MyRecords() {
         setPagination(result.pagination);
         setHasInitialData(true);
       } else {
-        toast.error("Failed to fetch records");
+        toast.error("Gagal mengambil catatan");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -133,9 +133,9 @@ export default function MyRecords() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return "Invalid Date";
+        return "Tanggal Tidak Valid";
       }
-      return date.toLocaleString('en-US', {
+      return date.toLocaleString('id-ID', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -150,7 +150,7 @@ export default function MyRecords() {
   const getPeriodBadge = (period: string) => {
     return (
       <Badge variant={period === "WEEKLY" ? "default" : "secondary"}>
-        {period.toLowerCase()}
+        {period === "WEEKLY" ? "Mingguan" : "Bulanan"}
       </Badge>
     );
   };
@@ -175,11 +175,11 @@ export default function MyRecords() {
     const percentage = (totalTaken / limit) * 100;
 
     if (percentage >= 90) {
-      return <Badge variant="destructive">Near Limit</Badge>;
+      return <Badge variant="destructive">Mendekati Batas</Badge>;
     } else if (percentage >= 70) {
-      return <Badge variant="secondary">Moderate</Badge>;
+      return <Badge variant="secondary">Sedang</Badge>;
     } else {
-      return <Badge variant="default">Good</Badge>;
+      return <Badge variant="default">Baik</Badge>;
     }
   };
 
@@ -208,7 +208,7 @@ export default function MyRecords() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading...</p>
+          <p className="mt-4 text-lg">Memuat...</p>
         </div>
       </div>
     );
@@ -228,10 +228,10 @@ export default function MyRecords() {
                 className="mr-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Kembali
               </Button>
               <h1 className="text-2xl font-bold text-gray-900">
-                My Consumption Records
+                Catatan Konsumsi Saya
               </h1>
             </div>
           </div>
@@ -242,10 +242,10 @@ export default function MyRecords() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Personal Consumption History
+            Riwayat Konsumsi Pribadi
           </h2>
           <p className="text-gray-600">
-            Track your consumption patterns and limits
+            Lacak pola konsumsi dan batasan Anda
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export default function MyRecords() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search records..."
+                placeholder="Cari catatan..."
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
@@ -264,14 +264,14 @@ export default function MyRecords() {
             <div className="flex gap-2">
               <Input
                 type="date"
-                placeholder="Start Date"
+                placeholder="Tanggal Mulai"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="w-40"
               />
               <Input
                 type="date"
-                placeholder="End Date"
+                placeholder="Tanggal Akhir"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="w-40"
@@ -288,7 +288,7 @@ export default function MyRecords() {
                 onClick={clearFilters}
                 className="whitespace-nowrap"
               >
-                Clear
+                Hapus
               </Button>
             </div>
           </div>
@@ -298,19 +298,19 @@ export default function MyRecords() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Records</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Catatan</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pagination.totalCount}</div>
               <p className="text-xs text-muted-foreground">
-                All time records
+                Semua catatan
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Month</CardTitle>
+              <CardTitle className="text-sm font-medium">Bulan Ini</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -323,13 +323,13 @@ export default function MyRecords() {
                 }).length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Records this month
+                Catatan bulan ini
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Items Taken</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Item Diambil</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -337,13 +337,13 @@ export default function MyRecords() {
                 {records.reduce((sum, record) => sum + record.quantity, 0)}
               </div>
               <p className="text-xs text-muted-foreground">
-                Total quantity taken
+                Total kuantitas diambil
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Types</CardTitle>
+              <CardTitle className="text-sm font-medium">Jenis Aktif</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -351,7 +351,7 @@ export default function MyRecords() {
                 <div className="text-2xl font-bold text-blue-600">
                   {new Set(records.map(r => r.item.consumptionType.id)).size}
                 </div>
-                <div className="text-sm text-gray-600">Consumption Types</div>
+                <div className="text-sm text-gray-600">Jenis Konsumsi</div>
               </div>
             </CardContent>
           </Card>
@@ -360,16 +360,16 @@ export default function MyRecords() {
         {/* Usage Summary by Type */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Usage Summary by Type</CardTitle>
+            <CardTitle>Ringkasan Penggunaan berdasarkan Jenis</CardTitle>
             <CardDescription>
-              Your current usage status for each consumption type
+              Status penggunaan Anda saat ini untuk setiap jenis konsumsi
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from(new Set(records.map(r => r.item.consumptionType.id))).map(typeId => {
                 const typeRecords = records.filter(r => r.item.consumptionType.id === typeId);
-                const typeName = typeRecords[0]?.item.consumptionType.name || 'Unknown';
+                const typeName = typeRecords[0]?.item.consumptionType.name || 'Tidak Diketahui';
                 const typePeriod = typeRecords[0]?.item.consumptionType.period || 'WEEKLY';
                 
                 // Calculate total taken for this type
@@ -400,8 +400,8 @@ export default function MyRecords() {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span>Used: {totalTaken}</span>
-                        <span>Limit: {limit}</span>
+                        <span>Terpakai: {totalTaken}</span>
+                        <span>Batas: {limit}</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
@@ -413,7 +413,7 @@ export default function MyRecords() {
                         ></div>
                       </div>
                       <div className="text-xs text-gray-600">
-                        Remaining: {Math.max(0, limit - totalTaken)} | {((totalTaken / limit) * 100).toFixed(1)}% used
+                        Sisa: {Math.max(0, limit - totalTaken)} | {((totalTaken / limit) * 100).toFixed(1)}% terpakai
                       </div>
                     </div>
                   </div>
@@ -426,14 +426,14 @@ export default function MyRecords() {
         {/* Records Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Records</CardTitle>
+            <CardTitle>Catatan Anda</CardTitle>
             <CardDescription>
-              Detailed view of all your consumption records
+              Tampilan detail dari semua catatan konsumsi Anda
             </CardDescription>
             {isLoading && hasInitialData && (
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                <span>Refreshing...</span>
+                <span>Memperbarui...</span>
               </div>
             )}
           </CardHeader>
@@ -441,7 +441,7 @@ export default function MyRecords() {
             {isLoading && !hasInitialData ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading records...</p>
+                <p className="mt-2 text-gray-600">Memuat catatan...</p>
               </div>
             ) : (
               <>
@@ -449,12 +449,12 @@ export default function MyRecords() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Item</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Usage Status</TableHead>
-                      <TableHead>Photo</TableHead>
-                      <TableHead>Notes</TableHead>
+                      <TableHead>Jenis</TableHead>
+                      <TableHead>Kuantitas</TableHead>
+                      <TableHead>Tanggal</TableHead>
+                      <TableHead>Status Penggunaan</TableHead>
+                      <TableHead>Foto</TableHead>
+                      <TableHead>Catatan</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -496,12 +496,12 @@ export default function MyRecords() {
                             <div className="flex flex-col items-center space-y-2">
                               <img
                                 src={record.photo}
-                                alt="Proof photo"
+                                alt="Foto bukti"
                                 className="h-10 w-10 object-cover rounded-lg border border-gray-200 cursor-pointer"
                                 onClick={() => {
                                   setSelectedPhoto({ 
                                     url: record.photo, 
-                                    name: `${record.item.name} - My Record` 
+                                    name: `${record.item.name} - Catatan Saya` 
                                   });
                                   setPhotoViewerOpen(true);
                                 }}
@@ -515,18 +515,18 @@ export default function MyRecords() {
                                 onClick={() => {
                                   setSelectedPhoto({ 
                                     url: record.photo, 
-                                    name: `${record.item.name} - My Record` 
+                                    name: `${record.item.name} - Catatan Saya` 
                                   });
                                   setPhotoViewerOpen(true);
                                 }}
                                 className="flex items-center space-x-2"
                               >
                                 <Eye className="h-4 w-4" />
-                                <span>View</span>
+                                <span>Lihat</span>
                               </Button>
                             </div>
                           ) : (
-                            <span className="text-gray-400 text-sm">No photo</span>
+                            <span className="text-gray-400 text-sm">Tidak ada foto</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -543,7 +543,7 @@ export default function MyRecords() {
                     {records.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                          {searchTerm || startDate || endDate ? "No records found matching your criteria." : "No consumption records found. Start by taking some items!"}
+                          {searchTerm || startDate || endDate ? "Tidak ada catatan yang cocok dengan kriteria Anda." : "Tidak ada catatan konsumsi ditemukan. Mulai dengan mengambil beberapa item!"}
                         </TableCell>
                       </TableRow>
                     )}

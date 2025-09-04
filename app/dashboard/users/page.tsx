@@ -72,7 +72,7 @@ export default function UserManagement() {
       router.push("/auth/signin");
     } else if (status === "authenticated" && session?.user.role !== "ADMIN") {
       router.push("/dashboard");
-      toast.error("Access denied. Admin privileges required.");
+      toast.error("Akses ditolak. Diperlukan hak akses admin.");
     }
   }, [status, session, router]);
 
@@ -110,10 +110,10 @@ export default function UserManagement() {
         setPagination(result.pagination);
         setHasInitialData(true); // Mark data as fetched
       } else {
-        toast.error("Failed to fetch users");
+        toast.error("Gagal mengambil data pengguna");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +122,7 @@ export default function UserManagement() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      toast.error("Please fill in all required fields");
+      toast.error("Mohon isi semua kolom yang diperlukan");
       return;
     }
 
@@ -137,16 +137,16 @@ export default function UserManagement() {
       });
 
       if (response.ok) {
-        toast.success("User created successfully!");
+        toast.success("Pengguna berhasil dibuat!");
         setShowCreateModal(false);
         setFormData({ name: "", email: "", password: "", role: "EMPLOYEE" });
         fetchUsers();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to create user");
+        toast.error(error.error || "Gagal membuat pengguna");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -172,17 +172,17 @@ export default function UserManagement() {
       });
 
       if (response.ok) {
-        toast.success("User updated successfully!");
+        toast.success("Pengguna berhasil diperbarui!");
         setShowEditModal(false);
         setSelectedUser(null);
         setFormData({ name: "", email: "", password: "", role: "EMPLOYEE" });
         fetchUsers();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to update user");
+        toast.error(error.error || "Gagal memperbarui pengguna");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -198,16 +198,16 @@ export default function UserManagement() {
       });
 
       if (response.ok) {
-        toast.success("User deleted successfully!");
+        toast.success("Pengguna berhasil dihapus!");
         setShowDeleteModal(false);
         setSelectedUser(null);
         fetchUsers();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to delete user");
+        toast.error(error.error || "Gagal menghapus pengguna");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -234,9 +234,9 @@ export default function UserManagement() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return "Invalid Date";
+        return "Tanggal Tidak Valid";
       }
-      return date.toLocaleString('en-US', {
+      return date.toLocaleString('id-ID', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -244,14 +244,14 @@ export default function UserManagement() {
         minute: '2-digit'
       });
     } catch {
-      return "Invalid Date";
+      return "Tanggal Tidak Valid";
     }
   };
 
   const getRoleBadge = (role: string) => {
     return (
       <Badge variant={role === "ADMIN" ? "destructive" : "default"}>
-        {role.toLowerCase()}
+        {role === "ADMIN" ? "admin" : "tim zona"}
       </Badge>
     );
   };
@@ -270,7 +270,7 @@ export default function UserManagement() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading...</p>
+          <p className="mt-4 text-lg">Memuat...</p>
         </div>
       </div>
     );
@@ -294,10 +294,10 @@ export default function UserManagement() {
                 className="mr-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Kembali
               </Button>
               <h1 className="text-2xl font-bold text-gray-900">
-                User Management
+                Manajemen Pengguna
               </h1>
             </div>
             <Button
@@ -305,7 +305,7 @@ export default function UserManagement() {
               className="flex items-center space-x-2"
             >
               <UserPlus className="h-4 w-4" />
-              <span>Add User</span>
+              <span>Tambah Pengguna</span>
             </Button>
           </div>
         </div>
@@ -315,10 +315,10 @@ export default function UserManagement() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Manage Users
+            Kelola Pengguna
           </h2>
           <p className="text-gray-600">
-            Create, edit, and manage user accounts and permissions
+            Buat, edit, dan kelola akun pengguna serta perizinan
           </p>
         </div>
 
@@ -326,19 +326,19 @@ export default function UserManagement() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Pengguna</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pagination.totalCount}</div>
               <p className="text-xs text-muted-foreground">
-                All registered users
+                Semua pengguna terdaftar
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Admins</CardTitle>
+              <CardTitle className="text-sm font-medium">Admin</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -346,13 +346,13 @@ export default function UserManagement() {
                 {users.filter(user => user.role === "ADMIN").length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Administrative users
+                Pengguna administratif
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Employees</CardTitle>
+              <CardTitle className="text-sm font-medium">Tim Zona</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -360,13 +360,13 @@ export default function UserManagement() {
                 {users.filter(user => user.role === "EMPLOYEE").length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Regular employees
+                Pengguna tim ZMG
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Pengguna Aktif</CardTitle>
               <Mail className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -374,7 +374,7 @@ export default function UserManagement() {
                 {users.filter(user => user.lastLogin).length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Users with login activity
+                Pengguna dengan aktivitas login
               </p>
             </CardContent>
           </Card>
@@ -385,7 +385,7 @@ export default function UserManagement() {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search users..."
+              placeholder="Cari pengguna..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
@@ -396,33 +396,33 @@ export default function UserManagement() {
         {/* Users Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Users</CardTitle>
+            <CardTitle>Pengguna</CardTitle>
             <CardDescription>
-              Manage user accounts, roles, and permissions
+              Kelola akun pengguna, peran, dan perizinan
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading && !hasInitialData ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading users...</p>
+                <p className="mt-2 text-gray-600">Memuat pengguna...</p>
               </div>
             ) : (
               <>
                 {isLoading && hasInitialData && (
                   <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                    <span>Refreshing...</span>
+                    <span>Menyegarkan...</span>
                   </div>
                 )}
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Last Login</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>Pengguna</TableHead>
+                      <TableHead>Peran</TableHead>
+                      <TableHead>Dibuat</TableHead>
+                      <TableHead>Login Terakhir</TableHead>
+                      <TableHead>Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -451,7 +451,7 @@ export default function UserManagement() {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm text-gray-600">
-                            {user.lastLogin ? formatDate(user.lastLogin) : "Never"}
+                            {user.lastLogin ? formatDate(user.lastLogin) : "Belum Pernah"}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -480,7 +480,7 @@ export default function UserManagement() {
                     {users.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          {searchTerm ? "No users found matching your search." : "No users found."}
+                          {searchTerm ? "Tidak ada pengguna yang ditemukan sesuai pencarian Anda." : "Tidak ada pengguna yang ditemukan."}
                         </TableCell>
                       </TableRow>
                     )}
@@ -505,10 +505,10 @@ export default function UserManagement() {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Create New User</h3>
+            <h3 className="text-lg font-semibold mb-4">Buat Pengguna Baru</h3>
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">Nama</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -527,7 +527,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Kata Sandi</Label>
                 <Input
                   id="password"
                   type="password"
@@ -537,7 +537,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">Peran</Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
@@ -548,14 +548,14 @@ export default function UserManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                    <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex space-x-2 pt-4">
                 <Button type="submit" disabled={isLoading} className="flex-1">
-                  {isLoading ? "Creating..." : "Create User"}
+                  {isLoading ? "Membuat..." : "Buat Pengguna"}
                 </Button>
                 <Button
                   type="button"
@@ -563,7 +563,7 @@ export default function UserManagement() {
                   onClick={() => setShowCreateModal(false)}
                   className="flex-1"
                 >
-                  Cancel
+                  Batal
                 </Button>
               </div>
             </form>
@@ -575,10 +575,10 @@ export default function UserManagement() {
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Edit User</h3>
+            <h3 className="text-lg font-semibold mb-4">Edit Pengguna</h3>
             <form onSubmit={handleEditUser} className="space-y-4">
               <div>
-                <Label htmlFor="edit-name">Name</Label>
+                <Label htmlFor="edit-name">Nama</Label>
                 <Input
                   id="edit-name"
                   value={formData.name}
@@ -597,7 +597,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-password">Password (leave blank to keep current)</Label>
+                <Label htmlFor="edit-password">Kata Sandi (kosongkan untuk mempertahankan yang sekarang)</Label>
                 <Input
                   id="edit-password"
                   type="password"
@@ -606,7 +606,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-role">Role</Label>
+                <Label htmlFor="edit-role">Peran</Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value: "ADMIN" | "EMPLOYEE") => 
@@ -617,14 +617,14 @@ export default function UserManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                    <SelectItem value="EMPLOYEE">Karyawan</SelectItem>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex space-x-2 pt-4">
                 <Button type="submit" disabled={isLoading} className="flex-1">
-                  {isLoading ? "Updating..." : "Update User"}
+                  {isLoading ? "Memperbarui..." : "Perbarui Pengguna"}
                 </Button>
                 <Button
                   type="button"
@@ -632,7 +632,7 @@ export default function UserManagement() {
                   onClick={() => setShowEditModal(false)}
                   className="flex-1"
                 >
-                  Cancel
+                  Batal
                 </Button>
               </div>
             </form>
@@ -644,10 +644,10 @@ export default function UserManagement() {
       {showDeleteModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Delete User</h3>
+            <h3 className="text-lg font-semibold mb-4">Hapus Pengguna</h3>
             <p className="text-gray-600 mb-4">
-              Are you sure you want to delete <strong>{selectedUser.name}</strong>? 
-              This action cannot be undone.
+              Apakah Anda yakin ingin menghapus <strong>{selectedUser.name}</strong>? 
+              Tindakan ini tidak dapat dibatalkan.
             </p>
             <div className="flex space-x-2">
               <Button
@@ -656,7 +656,7 @@ export default function UserManagement() {
                 disabled={isLoading}
                 className="flex-1"
               >
-                {isLoading ? "Deleting..." : "Delete User"}
+                {isLoading ? "Menghapus..." : "Hapus Pengguna"}
               </Button>
               <Button
                 variant="outline"

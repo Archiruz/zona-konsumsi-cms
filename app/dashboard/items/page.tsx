@@ -124,7 +124,7 @@ export default function Items() {
         setPagination(result.pagination);
       }
     } catch (error) {
-      toast.error("Failed to fetch items");
+      toast.error("Gagal mengambil item");
     }
   };
 
@@ -136,7 +136,7 @@ export default function Items() {
         setTypes(result.data);
       }
     } catch (error) {
-      toast.error("Failed to fetch consumption types");
+      toast.error("Gagal mengambil jenis konsumsi");
     }
   };
 
@@ -190,8 +190,8 @@ export default function Items() {
 
       if (response.ok) {
         const message = editingItem 
-          ? "Item updated successfully"
-          : "Item created successfully";
+          ? "Item berhasil diperbarui"
+          : "Item berhasil dibuat";
         toast.success(message);
         resetForm();
         // Reset to first page when adding/editing
@@ -199,17 +199,17 @@ export default function Items() {
         fetchItems();
       } else {
         const error = await response.json();
-        toast.error(error.error || `Failed to ${editingItem ? 'update' : 'create'} item`);
+        toast.error(error.error || `Gagal ${editingItem ? 'memperbarui' : 'membuat'} item`);
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (itemId: string) => {
-    if (!confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
+    if (!confirm("Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.")) {
       return;
     }
 
@@ -219,14 +219,14 @@ export default function Items() {
       });
 
       if (response.ok) {
-        toast.success("Item deleted successfully");
+        toast.success("Item berhasil dihapus");
         fetchItems();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to delete item");
+        toast.error(error.error || "Gagal menghapus item");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     }
   };
 
@@ -248,9 +248,9 @@ export default function Items() {
     try {
       // For now, we'll show a message about the feature
       // In a full implementation, you could use a library like JSZip to create a zip file
-      toast.success("QR codes are now visible in the table. You can download individual QR codes using the download button on each one.");
+      toast.success("QR code sekarang terlihat di tabel. Anda dapat mengunduh QR code individual menggunakan tombol unduh pada masing-masing.");
     } catch (error) {
-      toast.error("Failed to generate QR codes");
+      toast.error("Gagal membuat QR code");
     }
   };
 
@@ -268,14 +268,14 @@ export default function Items() {
 
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        toast.error("Please allow popups to print QR codes");
+        toast.error("Harap izinkan popup untuk mencetak QR code");
         return;
       }
 
       const qrCodesHTML = items.map((item, index) => `
         <div style="display: inline-block; margin: 10px; text-align: center; page-break-inside: avoid;">
           <div style="border: 1px solid #ccc; padding: 10px; background: white;">
-            <img src="${qrCodeDataUrls[index]}" alt="QR Code for ${item.name}" width="128" height="128" />
+            <img src="${qrCodeDataUrls[index]}" alt="QR Code untuk ${item.name}" width="128" height="128" />
             <div style="margin-top: 5px; font-size: 12px; font-weight: bold;">${item.name}</div>
             <div style="font-size: 10px; color: #666;">ID: ${item.id}</div>
           </div>
@@ -284,7 +284,7 @@ export default function Items() {
 
       printWindow.document.documentElement.innerHTML = `
         <head>
-          <title>QR Codes - ${items.length} Items</title>
+          <title>QR Code - ${items.length} Item</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             @media print { 
@@ -294,18 +294,18 @@ export default function Items() {
           </style>
         </head>
         <body>
-          <h1 class="no-print">QR Codes for ${items.length} Items</h1>
-          <p class="no-print">Print this page to get all QR codes for easy scanning</p>
-          <button class="no-print" onclick="window.print()">Print</button>
+          <h1 class="no-print">QR Code untuk ${items.length} Item</h1>
+          <p class="no-print">Cetak halaman ini untuk mendapatkan semua QR code untuk pemindaian yang mudah</p>
+          <button class="no-print" onclick="window.print()">Cetak</button>
           <div style="text-align: center;">
             ${qrCodesHTML}
           </div>
         </body>
       `;
 
-      toast.success("Print window opened. Generate QR codes and print them.");
+      toast.success("Jendela cetak dibuka. Buat QR code dan cetak.");
     } catch (error) {
-      toast.error("Failed to generate QR codes for printing");
+      toast.error("Gagal membuat QR code untuk dicetak");
     }
   };
 
@@ -314,9 +314,9 @@ export default function Items() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return "Invalid Date";
+        return "Tanggal Tidak Valid";
       }
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('id-ID', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -331,7 +331,7 @@ export default function Items() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading...</p>
+          <p className="mt-4 text-lg">Memuat...</p>
         </div>
       </div>
     );
@@ -355,10 +355,10 @@ export default function Items() {
                 className="mr-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Kembali
               </Button>
               <h1 className="text-2xl font-bold text-gray-900">
-                Manage Consumption Items
+                Kelola Item Konsumsi
               </h1>
             </div>
           </div>
@@ -371,10 +371,10 @@ export default function Items() {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Consumption Items
+                Item Konsumsi
               </h2>
               <p className="text-gray-600">
-                Manage the items available for consumption
+                Kelola item yang tersedia untuk konsumsi
               </p>
             </div>
             <Button
@@ -390,12 +390,12 @@ export default function Items() {
               {editingItem ? (
                 <>
                   <X className="h-4 w-4" />
-                  <span>Cancel Edit</span>
+                  <span>Batal Edit</span>
                 </>
               ) : (
                 <>
                   <Plus className="h-4 w-4" />
-                  <span>Add New Item</span>
+                  <span>Tambah Item Baru</span>
                 </>
               )}
             </Button>
@@ -408,7 +408,7 @@ export default function Items() {
                   className="flex items-center space-x-2"
                 >
                   <QrCode className="h-4 w-4" />
-                  <span>Generate All QR Codes</span>
+                  <span>Buat Semua QR Code</span>
                 </Button>
                 
                 <Button
@@ -417,7 +417,7 @@ export default function Items() {
                   className="flex items-center space-x-2"
                 >
                   <QrCode className="h-4 w-4" />
-                  <span>Print All QR Codes</span>
+                  <span>Cetak Semua QR Code</span>
                 </Button>
               </div>
             )}
@@ -430,7 +430,7 @@ export default function Items() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search items..."
+                placeholder="Cari item..."
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
@@ -442,10 +442,10 @@ export default function Items() {
                 onValueChange={handleTypeFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Filter by type" />
+                  <SelectValue placeholder="Filter berdasarkan jenis" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="all">Semua Jenis</SelectItem>
                   {types.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       {type.name}
@@ -462,12 +462,12 @@ export default function Items() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>
-                {editingItem ? "Edit Consumption Item" : "Add New Consumption Item"}
+                {editingItem ? "Edit Item Konsumsi" : "Tambah Item Konsumsi Baru"}
               </CardTitle>
               <CardDescription>
                 {editingItem 
-                  ? "Update the item details"
-                  : "Create a new item with its details and type"
+                  ? "Perbarui detail item"
+                  : "Buat item baru dengan detail dan jenisnya"
                 }
               </CardDescription>
             </CardHeader>
@@ -475,28 +475,28 @@ export default function Items() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Item Name</Label>
+                    <Label htmlFor="name">Nama Item</Label>
                     <Input
                       id="name"
-                      placeholder="e.g., Coffee Beans"
+                      placeholder="contoh: Biji Kopi"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="consumptionTypeId">Consumption Type</Label>
+                    <Label htmlFor="consumptionTypeId">Jenis Konsumsi</Label>
                     <Select
                       value={formData.consumptionTypeId}
                       onValueChange={(value) => setFormData({ ...formData, consumptionTypeId: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
+                        <SelectValue placeholder="Pilih jenis" />
                       </SelectTrigger>
                       <SelectContent>
                         {types.map((type) => (
                           <SelectItem key={type.id} value={type.id}>
-                            {type.name} ({type.period.toLowerCase()})
+                            {type.name} ({type.period === "WEEKLY" ? "Mingguan" : "Bulanan"})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -505,7 +505,7 @@ export default function Items() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="purchaseDate">Purchase Date</Label>
+                    <Label htmlFor="purchaseDate">Tanggal Pembelian</Label>
                     <Input
                       id="purchaseDate"
                       type="date"
@@ -515,21 +515,21 @@ export default function Items() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stock">Stock</Label>
+                    <Label htmlFor="stock">Stok</Label>
                     <Input
                       id="stock"
                       type="number"
-                      placeholder="e.g., 100"
+                      placeholder="contoh: 100"
                       value={formData.stock}
                       onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Label htmlFor="description">Deskripsi (Opsional)</Label>
                     <Textarea
                       id="description"
-                      placeholder="Describe the item..."
+                      placeholder="Jelaskan item..."
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
@@ -540,15 +540,15 @@ export default function Items() {
                   <PhotoUpload
                     value={formData.photo}
                     onChange={(value) => setFormData({ ...formData, photo: value })}
-                    label="Photo (Optional)"
-                    placeholder="Enter photo URL or upload file"
+                    label="Foto (Opsional)"
+                    placeholder="Masukkan URL foto atau unggah file"
                   />
                 </div>
                 <div className="flex space-x-4">
                   <Button type="submit" disabled={isLoading}>
                     {isLoading 
-                      ? (editingItem ? "Updating..." : "Creating...")
-                      : (editingItem ? "Update Item" : "Create Item")
+                      ? (editingItem ? "Memperbarui..." : "Membuat...")
+                      : (editingItem ? "Perbarui Item" : "Buat Item")
                     }
                   </Button>
                   <Button
@@ -556,7 +556,7 @@ export default function Items() {
                     variant="outline"
                     onClick={resetForm}
                   >
-                    Cancel
+                    Batal
                   </Button>
                 </div>
               </form>
@@ -567,23 +567,23 @@ export default function Items() {
         {/* Items Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Available Items</CardTitle>
+            <CardTitle>Item yang Tersedia</CardTitle>
             <CardDescription>
-              All consumption items and their details. QR codes contain the item ID for quick scanning.
+              Semua item konsumsi dan detailnya. QR code berisi ID item untuk pemindaian cepat.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Purchase Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Photo</TableHead>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Jenis</TableHead>
+                  <TableHead>Stok</TableHead>
+                  <TableHead>Tanggal Pembelian</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead>Foto</TableHead>
                   <TableHead>QR Code</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -595,7 +595,7 @@ export default function Items() {
                         <Package className="h-4 w-4 text-gray-500" />
                         <span>{item.consumptionType.name}</span>
                         <span className="text-xs text-gray-500">
-                          ({item.consumptionType.period.toLowerCase()})
+                          ({item.consumptionType.period === "WEEKLY" ? "Mingguan" : "Bulanan"})
                         </span>
                       </div>
                     </TableCell>
@@ -620,7 +620,7 @@ export default function Items() {
                         }} />
                       ) : (
                         <div className="h-10 w-10 bg-gray-200 flex items-center justify-center rounded-full text-gray-500 cursor-pointer" onClick={() => {
-                          setSelectedPhoto({ url: "", name: "No Photo" });
+                          setSelectedPhoto({ url: "", name: "Tidak Ada Foto" });
                           setPhotoViewerOpen(true);
                         }}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M15.5 6h-7a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-8a4 4 0 0 0-4-4h-7"/></svg>
@@ -672,7 +672,7 @@ export default function Items() {
                 {items.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center text-gray-500 py-8">
-                      {searchTerm || selectedTypeId !== "all" ? "No items found matching your criteria." : "No items found. Create your first one above."}
+                      {searchTerm || selectedTypeId !== "all" ? "Tidak ada item yang cocok dengan kriteria Anda." : "Tidak ada item ditemukan. Buat yang pertama di atas."}
                     </TableCell>
                   </TableRow>
                 )}

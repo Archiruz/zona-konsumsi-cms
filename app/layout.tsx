@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Zona Konsumsi CMS",
-  description: "Content Management System for Office Consumption Inventory",
+  description: "Content Management System untuk kebutuhan manajemen konsumsi internal kantor",
 };
 
 export default function RootLayout({

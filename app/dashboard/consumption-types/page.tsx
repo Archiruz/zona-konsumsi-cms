@@ -95,7 +95,7 @@ export default function ConsumptionTypes() {
         setPagination(result.pagination);
       }
     } catch (error) {
-      toast.error("Failed to fetch consumption types");
+      toast.error("Gagal mengambil jenis konsumsi");
     }
   };
 
@@ -140,8 +140,8 @@ export default function ConsumptionTypes() {
 
       if (response.ok) {
         const message = editingType 
-          ? "Consumption type updated successfully"
-          : "Consumption type created successfully";
+          ? "Jenis konsumsi berhasil diperbarui"
+          : "Jenis konsumsi berhasil dibuat";
         toast.success(message);
         resetForm();
         // Reset to first page when adding/editing
@@ -149,17 +149,17 @@ export default function ConsumptionTypes() {
         fetchTypes();
       } else {
         const error = await response.json();
-        toast.error(error.error || `Failed to ${editingType ? 'update' : 'create'} consumption type`);
+        toast.error(error.error || `Gagal ${editingType ? 'memperbarui' : 'membuat'} jenis konsumsi`);
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (typeId: string) => {
-    if (!confirm("Are you sure you want to delete this consumption type? This action cannot be undone.")) {
+    if (!confirm("Apakah Anda yakin ingin menghapus jenis konsumsi ini? Tindakan ini tidak dapat dibatalkan.")) {
       return;
     }
 
@@ -169,14 +169,14 @@ export default function ConsumptionTypes() {
       });
 
       if (response.ok) {
-        toast.success("Consumption type deleted successfully");
+        toast.success("Jenis konsumsi berhasil dihapus");
         fetchTypes();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to delete consumption type");
+        toast.error(error.error || "Gagal menghapus jenis konsumsi");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     }
   };
 
@@ -194,15 +194,15 @@ export default function ConsumptionTypes() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return "Invalid Date";
+        return "Tanggal Tidak Valid";
       }
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('id-ID', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       });
     } catch {
-      return "Invalid Date";
+      return "Tanggal Tidak Valid";
     }
   };
 
@@ -211,7 +211,7 @@ export default function ConsumptionTypes() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading...</p>
+          <p className="mt-4 text-lg">Memuat...</p>
         </div>
       </div>
     );
@@ -235,10 +235,10 @@ export default function ConsumptionTypes() {
                 className="mr-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Kembali
               </Button>
               <h1 className="text-2xl font-bold text-gray-900">
-                Manage Consumption Types
+                Kelola Jenis Konsumsi
               </h1>
             </div>
           </div>
@@ -251,10 +251,10 @@ export default function ConsumptionTypes() {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Consumption Types
+                Jenis Konsumsi
               </h2>
               <p className="text-gray-600">
-                Manage the types and limits of consumption items
+                Kelola jenis dan batasan item konsumsi
               </p>
             </div>
             <Button
@@ -270,12 +270,12 @@ export default function ConsumptionTypes() {
               {editingType ? (
                 <>
                   <X className="h-4 w-4" />
-                  <span>Cancel Edit</span>
+                  <span>Batal Edit</span>
                 </>
               ) : (
                 <>
                   <Plus className="h-4 w-4" />
-                  <span>Add New Type</span>
+                  <span>Tambah Jenis Baru</span>
                 </>
               )}
             </Button>
@@ -287,7 +287,7 @@ export default function ConsumptionTypes() {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search types..."
+              placeholder="Cari jenis..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
@@ -300,12 +300,12 @@ export default function ConsumptionTypes() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>
-                {editingType ? "Edit Consumption Type" : "Add New Consumption Type"}
+                {editingType ? "Edit Jenis Konsumsi" : "Tambah Jenis Konsumsi Baru"}
               </CardTitle>
               <CardDescription>
                 {editingType 
-                  ? "Update the consumption type details"
-                  : "Create a new consumption type with its limits"
+                  ? "Perbarui detail jenis konsumsi"
+                  : "Buat jenis konsumsi baru dengan batasannya"
                 }
               </CardDescription>
             </CardHeader>
@@ -313,21 +313,21 @@ export default function ConsumptionTypes() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">Nama</Label>
                     <Input
                       id="name"
-                      placeholder="e.g., Weekly Snacks"
+                      placeholder="contoh: Snack Mingguan"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="limit">Limit per Period</Label>
+                    <Label htmlFor="limit">Batas per Periode</Label>
                     <Input
                       id="limit"
                       type="number"
-                      placeholder="e.g., 5"
+                      placeholder="contoh: 5"
                       value={formData.limit}
                       onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
                       required
@@ -336,7 +336,7 @@ export default function ConsumptionTypes() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="period">Period</Label>
+                    <Label htmlFor="period">Periode</Label>
                     <Select
                       value={formData.period}
                       onValueChange={(value: "WEEKLY" | "MONTHLY") =>
@@ -347,16 +347,16 @@ export default function ConsumptionTypes() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="WEEKLY">Weekly</SelectItem>
-                        <SelectItem value="MONTHLY">Monthly</SelectItem>
+                        <SelectItem value="WEEKLY">Mingguan</SelectItem>
+                        <SelectItem value="MONTHLY">Bulanan</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Label htmlFor="description">Deskripsi (Opsional)</Label>
                     <Input
                       id="description"
-                      placeholder="e.g., Snacks and beverages"
+                      placeholder="contoh: Snack dan minuman"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
@@ -365,8 +365,8 @@ export default function ConsumptionTypes() {
                 <div className="flex space-x-4">
                   <Button type="submit" disabled={isLoading}>
                     {isLoading 
-                      ? (editingType ? "Updating..." : "Creating...")
-                      : (editingType ? "Update Type" : "Create Type")
+                      ? (editingType ? "Memperbarui..." : "Membuat...")
+                      : (editingType ? "Perbarui Jenis" : "Buat Jenis")
                     }
                   </Button>
                   <Button
@@ -374,7 +374,7 @@ export default function ConsumptionTypes() {
                     variant="outline"
                     onClick={resetForm}
                   >
-                    Cancel
+                    Batal
                   </Button>
                 </div>
               </form>
@@ -385,21 +385,21 @@ export default function ConsumptionTypes() {
         {/* Types Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Existing Types</CardTitle>
+            <CardTitle>Jenis yang Ada</CardTitle>
             <CardDescription>
-              All consumption types and their limits
+              Semua jenis konsumsi dan batasannya
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Limit</TableHead>
-                  <TableHead>Period</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead>Batas</TableHead>
+                  <TableHead>Periode</TableHead>
+                  <TableHead>Dibuat</TableHead>
+                  <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -408,7 +408,7 @@ export default function ConsumptionTypes() {
                     <TableCell className="font-medium">{type.name}</TableCell>
                     <TableCell>{type.description || "-"}</TableCell>
                     <TableCell>{type.limit}</TableCell>
-                    <TableCell className="capitalize">{type.period.toLowerCase()}</TableCell>
+                    <TableCell className="capitalize">{type.period === "WEEKLY" ? "Mingguan" : "Bulanan"}</TableCell>
                     <TableCell>
                       {formatDate(type.createdAt)}
                     </TableCell>
@@ -436,7 +436,7 @@ export default function ConsumptionTypes() {
                 {types.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                      {searchTerm ? "No types found matching your search." : "No consumption types found. Create your first one above."}
+                      {searchTerm ? "Tidak ada jenis yang cocok dengan pencarian Anda." : "Tidak ada jenis konsumsi ditemukan. Buat yang pertama di atas."}
                     </TableCell>
                   </TableRow>
                 )}

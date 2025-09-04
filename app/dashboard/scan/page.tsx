@@ -50,7 +50,7 @@ export default function ScanQR() {
 
   const handleQRScan = async () => {
     if (!qrInput.trim()) {
-      toast.error("Please enter a QR code or item ID");
+      toast.error("Silakan masukkan kode QR atau ID barang");
       return;
     }
 
@@ -68,13 +68,13 @@ export default function ScanQR() {
         const item = await response.json();
         setScannedItem(item);
         setShowForm(true);
-        toast.success("Item found! Please fill in the details below.");
+        toast.success("Barang ditemukan! Silakan isi detail di bawah ini.");
       } else {
         const error = await response.json();
-        toast.error(error.error || "Item not found");
+        toast.error(error.error || "Barang tidak ditemukan");
       }
     } catch (error) {
-      toast.error("Failed to scan QR code");
+      toast.error("Gagal memindai kode QR");
     } finally {
       setIsLoading(false);
     }
@@ -83,12 +83,12 @@ export default function ScanQR() {
   const handleScannerResult = (result: string) => {
     setQrInput(result);
     setShowScanner(false);
-    toast.success("QR Code scanned! Click 'Submit' to continue.");
+    toast.success("Kode QR berhasil dipindai! Klik 'Kirim' untuk melanjutkan.");
   };
 
   const handleManualSubmit = () => {
     if (!qrInput.trim()) {
-      toast.error("Please enter a QR code or item ID");
+      toast.error("Silakan masukkan kode QR atau ID barang");
       return;
     }
     handleQRScan();
@@ -114,24 +114,24 @@ export default function ScanQR() {
       });
 
       if (response.ok) {
-        toast.success("Item taken successfully!");
+        toast.success("Barang berhasil diambil!");
         setScannedItem(null);
         setShowForm(false);
         setFormData({ quantity: "1", notes: "", photo: "" });
         setQrInput("");
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to take item");
+        toast.error(error.error || "Gagal mengambil barang");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
   };
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <div>Memuat...</div>;
   }
 
   return (
@@ -148,10 +148,10 @@ export default function ScanQR() {
                 className="mr-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Kembali
               </Button>
               <h1 className="text-2xl font-bold text-gray-900">
-                Scan QR Code
+                Pindai Kode QR
               </h1>
             </div>
           </div>
@@ -162,10 +162,10 @@ export default function ScanQR() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Take Consumption Items
+            Ambil Barang Konsumsi
           </h2>
           <p className="text-gray-600">
-            Scan a QR code or enter item ID to take items
+            Pindai kode QR atau masukkan ID barang untuk mengambil barang
           </p>
         </div>
 
@@ -174,16 +174,16 @@ export default function ScanQR() {
           <CardHeader>
             <CardTitle className="flex items-center justify-center space-x-2">
               <QrCode className="h-6 w-6" />
-              <span>Scan QR Code</span>
+              <span>Pindai Kode QR</span>
             </CardTitle>
             <CardDescription className="text-center">
-              Enter the QR code or item ID manually
+              Masukkan kode QR atau ID barang secara manual
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex space-x-4">
               <Input
-                placeholder="Enter QR code or item ID manually"
+                placeholder="Masukkan kode QR atau ID barang secara manual"
                 value={qrInput}
                 onChange={(e) => setQrInput(e.target.value)}
                 className="flex-1"
@@ -196,20 +196,20 @@ export default function ScanQR() {
                 {qrInput.trim() ? (
                   <>
                     <QrCode className="h-4 w-4" />
-                    <span>{isLoading ? "Submitting..." : "Submit"}</span>
+                    <span>{isLoading ? "Mengirim..." : "Kirim"}</span>
                   </>
                 ) : (
                   <>
                     <Camera className="h-4 w-4" />
-                    <span>Scan QR Code</span>
+                    <span>Pindai Kode QR</span>
                   </>
                 )}
               </Button>
             </div>
             <div className="mt-2 text-xs text-gray-500 text-center">
               {qrInput.trim() 
-                ? "Code entered! Click Submit to continue."
-                : "Use the camera to scan a QR code or enter the code manually above."
+                ? "Kode telah dimasukkan! Klik Kirim untuk melanjutkan."
+                : "Gunakan kamera untuk memindai kode QR atau masukkan kode secara manual di atas."
               }
             </div>
           </CardContent>
@@ -224,7 +224,7 @@ export default function ScanQR() {
                 <span>{scannedItem.name}</span>
               </CardTitle>
               <CardDescription>
-                Fill in the details to take this item
+                Isi detail untuk mengambil barang ini
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -232,20 +232,20 @@ export default function ScanQR() {
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Available Stock</Label>
+                    <Label className="text-sm font-medium text-gray-700">Stok Tersedia</Label>
                     <p className="text-lg font-semibold text-green-600">{scannedItem.stock}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Type</Label>
+                    <Label className="text-sm font-medium text-gray-700">Jenis</Label>
                     <p className="text-lg font-semibold">{scannedItem.consumptionType.name}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Limit per {scannedItem.consumptionType.period.toLowerCase()}</Label>
+                    <Label className="text-sm font-medium text-gray-700">Batas per {scannedItem.consumptionType.period === 'WEEKLY' ? 'minggu' : 'bulan'}</Label>
                     <p className="text-lg font-semibold text-blue-600">{scannedItem.consumptionType.limit}</p>
                   </div>
                   {scannedItem.description && (
                     <div>
-                      <Label className="text-sm font-medium text-gray-700">Description</Label>
+                      <Label className="text-sm font-medium text-gray-700">Deskripsi</Label>
                       <p className="text-sm text-gray-600">{scannedItem.description}</p>
                     </div>
                   )}
@@ -256,7 +256,7 @@ export default function ScanQR() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="quantity">Quantity to Take</Label>
+                    <Label htmlFor="quantity">Jumlah yang Diambil</Label>
                     <Input
                       id="quantity"
                       type="number"
@@ -267,14 +267,14 @@ export default function ScanQR() {
                       required
                     />
                     <p className="text-xs text-gray-500">
-                      Maximum: {scannedItem.stock}
+                      Maksimum: {scannedItem.stock}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="notes">Notes (Optional)</Label>
+                    <Label htmlFor="notes">Catatan (Opsional)</Label>
                     <Textarea
                       id="notes"
-                      placeholder="Any additional notes..."
+                      placeholder="Catatan tambahan..."
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={2}
@@ -286,14 +286,14 @@ export default function ScanQR() {
                   <PhotoUpload
                     value={formData.photo}
                     onChange={(value) => setFormData({ ...formData, photo: value })}
-                    label="Proof Photo (Required)"
-                    placeholder="Upload photo or enter URL as proof"
+                    label="Foto Bukti (Wajib)"
+                    placeholder="Unggah foto atau masukkan URL sebagai bukti"
                   />
                 </div>
 
                 <div className="flex space-x-4">
                   <Button type="submit" disabled={isLoading || !formData.photo}>
-                    {isLoading ? "Taking Item..." : "Take Item"}
+                    {isLoading ? "Mengambil Barang..." : "Ambil Barang"}
                   </Button>
                   <Button
                     type="button"
@@ -305,7 +305,7 @@ export default function ScanQR() {
                       setQrInput("");
                     }}
                   >
-                    Cancel
+                    Batal
                   </Button>
                 </div>
               </form>
@@ -317,7 +317,7 @@ export default function ScanQR() {
         {!scannedItem && (
           <Card>
             <CardHeader>
-              <CardTitle>How to Use</CardTitle>
+              <CardTitle>Cara Penggunaan</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -326,9 +326,9 @@ export default function ScanQR() {
                     <span className="text-blue-600 text-sm font-medium">1</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Scan QR Code</h4>
+                    <h4 className="font-medium">Pindai Kode QR</h4>
                     <p className="text-sm text-gray-600">
-                      Use your phone to scan the QR code on the item, or manually enter the item ID above.
+                      Gunakan ponsel Anda untuk memindai kode QR pada barang, atau masukkan ID barang secara manual di atas.
                     </p>
                   </div>
                 </div>
@@ -337,9 +337,9 @@ export default function ScanQR() {
                     <span className="text-blue-600 text-sm font-medium">2</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Fill Details</h4>
+                    <h4 className="font-medium">Isi Detail</h4>
                     <p className="text-sm text-gray-600">
-                      Enter the quantity you want to take and any additional notes.
+                      Masukkan jumlah yang ingin diambil dan catatan tambahan jika ada.
                     </p>
                   </div>
                 </div>
@@ -348,9 +348,9 @@ export default function ScanQR() {
                     <span className="text-blue-600 text-sm font-medium">3</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Upload Photo</h4>
+                    <h4 className="font-medium">Unggah Foto</h4>
                     <p className="text-sm text-gray-600">
-                      Take a photo as proof of taking the item. This is required.
+                      Ambil foto sebagai bukti pengambilan barang. Ini wajib dilakukan.
                     </p>
                   </div>
                 </div>
@@ -359,9 +359,9 @@ export default function ScanQR() {
                     <span className="text-blue-600 text-sm font-medium">4</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Submit</h4>
+                    <h4 className="font-medium">Kirim</h4>
                     <p className="text-sm text-gray-600">
-                      Click "Take Item" to complete the process. The system will check your limits automatically.
+                      Klik "Ambil Barang" untuk menyelesaikan proses. Sistem akan memeriksa batas pengambilan Anda secara otomatis.
                     </p>
                   </div>
                 </div>

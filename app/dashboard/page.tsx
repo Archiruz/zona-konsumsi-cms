@@ -23,7 +23,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">Loading...</p>
+          <p className="mt-4 text-lg">Memuat...</p>
         </div>
       </div>
     );
@@ -53,7 +53,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">
-                Welcome, {session.user.name} ({session.user.role})
+                Selamat datang, {session.user.name} ({session.user.role})
               </span>
               <Button
                 variant="outline"
@@ -62,7 +62,7 @@ export default function Dashboard() {
                 className="flex items-center space-x-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
+                <span>Keluar</span>
               </Button>
             </div>
           </div>
@@ -76,13 +76,13 @@ export default function Dashboard() {
             Dashboard
           </h2>
           <p className="text-gray-600">
-            Manage your office consumption inventory
+            Kelola inventaris konsumsi kantor Anda
           </p>
         </div>
 
         {session?.user.role === "ADMIN" && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Admin Tools</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Menu Admin</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Link
                 href="/dashboard/consumption-types"
@@ -93,8 +93,8 @@ export default function Dashboard() {
                     <Tag className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Consumption Types</h4>
-                    <p className="text-sm text-gray-500">Manage item categories</p>
+                    <h4 className="font-medium text-gray-900">Jenis Konsumsi</h4>
+                    <p className="text-sm text-gray-500">Kelola kategori item</p>
                   </div>
                 </div>
               </Link>
@@ -107,8 +107,8 @@ export default function Dashboard() {
                     <Package className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Items</h4>
-                    <p className="text-sm text-gray-500">Manage consumption items</p>
+                    <h4 className="font-medium text-gray-900">Item</h4>
+                    <p className="text-sm text-gray-500">Kelola item konsumsi</p>
                   </div>
                 </div>
               </Link>
@@ -121,8 +121,8 @@ export default function Dashboard() {
                     <ClipboardList className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Records</h4>
-                    <p className="text-sm text-gray-500">View all consumption records</p>
+                    <h4 className="font-medium text-gray-900">Catatan</h4>
+                    <p className="text-sm text-gray-500">Lihat semua catatan konsumsi</p>
                   </div>
                 </div>
               </Link>
@@ -135,8 +135,8 @@ export default function Dashboard() {
                     <Users className="h-5 w-5 text-indigo-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">User Management</h4>
-                    <p className="text-sm text-gray-500">Manage users and roles</p>
+                    <h4 className="font-medium text-gray-900">Manajemen Pengguna</h4>
+                    <p className="text-sm text-gray-500">Kelola pengguna dan peran</p>
                   </div>
                 </div>
               </Link>
@@ -146,7 +146,7 @@ export default function Dashboard() {
 
         {/* User Tools */}
         <div className="space-y-4 mt-8">
-          <h3 className="text-lg font-semibold text-gray-900">User Tools</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Menu Pengguna</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
               href="/dashboard/scan"
@@ -157,8 +157,8 @@ export default function Dashboard() {
                   <QrCode className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Scan QR Code</h4>
-                  <p className="text-sm text-gray-500">Scan QR code to take items</p>
+                  <h4 className="font-medium text-gray-900">Pindai QR Code</h4>
+                  <p className="text-sm text-gray-500">Pindai QR code untuk mengambil item</p>
                 </div>
               </div>
             </Link>
@@ -171,8 +171,8 @@ export default function Dashboard() {
                   <ClipboardList className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">My Records</h4>
-                  <p className="text-sm text-gray-500">View your consumption history</p>
+                  <h4 className="font-medium text-gray-900">Catatan Saya</h4>
+                  <p className="text-sm text-gray-500">Lihat riwayat konsumsi Anda</p>
                 </div>
               </div>
             </Link>
